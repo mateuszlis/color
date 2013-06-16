@@ -1,0 +1,4 @@
+/Users/lisu/Downloads/gmock-1.6.0/build/CMakeFiles/gmock.dir
+/Users/lisu/Downloads/gmock-1.6.0/build/CMakeFiles/gmock_main.dir
+/Users/lisu/Downloads/gmock-1.6.0/build/gtest/CMakeFiles/gtest.dir
+/Users/lisu/Downloads/gmock-1.6.0/build/gtest/CMakeFiles/gtest_main.dir

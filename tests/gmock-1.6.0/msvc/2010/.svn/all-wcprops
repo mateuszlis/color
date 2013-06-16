@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/!svn/ver/97/trunk/pymd2mc/mcsimulation/gmock-1.6.0/msvc/2010
+END
+gmock_config.props
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/!svn/ver/97/trunk/pymd2mc/mcsimulation/gmock-1.6.0/msvc/2010/gmock_config.props
+END
+gmock_test.vcxproj
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/!svn/ver/97/trunk/pymd2mc/mcsimulation/gmock-1.6.0/msvc/2010/gmock_test.vcxproj
+END
+gmock.vcxproj
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/!svn/ver/97/trunk/pymd2mc/mcsimulation/gmock-1.6.0/msvc/2010/gmock.vcxproj
+END
+gmock.sln
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/!svn/ver/97/trunk/pymd2mc/mcsimulation/gmock-1.6.0/msvc/2010/gmock.sln
+END
+gmock_main.vcxproj
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/!svn/ver/97/trunk/pymd2mc/mcsimulation/gmock-1.6.0/msvc/2010/gmock_main.vcxproj
+END

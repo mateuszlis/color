@@ -1,0 +1,41 @@
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/!svn/ver/97/trunk/pymd2mc/mcsimulation/gmock-1.6.0/gtest/xcode/Config
+END
+StaticLibraryTarget.xcconfig
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/svn/!svn/ver/97/trunk/pymd2mc/mcsimulation/gmock-1.6.0/gtest/xcode/Config/StaticLibraryTarget.xcconfig
+END
+FrameworkTarget.xcconfig
+K 25
+svn:wc:ra_dav:version-url
+V 99
+/svn/!svn/ver/97/trunk/pymd2mc/mcsimulation/gmock-1.6.0/gtest/xcode/Config/FrameworkTarget.xcconfig
+END
+TestTarget.xcconfig
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/!svn/ver/97/trunk/pymd2mc/mcsimulation/gmock-1.6.0/gtest/xcode/Config/TestTarget.xcconfig
+END
+ReleaseProject.xcconfig
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svn/!svn/ver/97/trunk/pymd2mc/mcsimulation/gmock-1.6.0/gtest/xcode/Config/ReleaseProject.xcconfig
+END
+DebugProject.xcconfig
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/!svn/ver/97/trunk/pymd2mc/mcsimulation/gmock-1.6.0/gtest/xcode/Config/DebugProject.xcconfig
+END
+General.xcconfig
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/!svn/ver/97/trunk/pymd2mc/mcsimulation/gmock-1.6.0/gtest/xcode/Config/General.xcconfig
+END
