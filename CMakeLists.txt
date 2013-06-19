@@ -2,6 +2,8 @@ cmake_minimum_required (VERSION 2.6)
 option(BUILD_TESTS "Build all of unit tests." FALSE)
 project (color)
 
+add_subdirectory(CMake)
+
 
 
 # Set default build type
