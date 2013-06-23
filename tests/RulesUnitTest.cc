@@ -6,6 +6,7 @@
  */
 // std
 #include <iostream>
+#include <limits>
 
 // stl
 #include <vector>
@@ -73,6 +74,30 @@ TEST( RuleTest, colorize_whole_lines_with_numbers )
     EXPECT_EQ( lResult
             , std::string( "\033[31m" + lFourthLine + "\033[0m" ) );
 }
+
+TEST( NumberRuleTest, one_color )
+{
+    const uint8_t lLinesCount( 0 );
+    NumberRule::Ptr lRule( new NumberRule( lLinesCount, RED ) );
+    
+    std::vector< std::string > lLines;
+    std::string lBaseLine( "This is a Line" );
+    
+    typedef uint16_t testedType;
+    for ( testedType lI( 0 ) 
+            ; lI < std::numeric_limits< testedType >::max() 
+            ; ++lI )
+    {
+        std::stringstream lStream;
+        lStream << lBaseLine << " " << lI;
+        lLines.push_back( lStream.str() );
+    }
+
+   for_each(lLines.begin(), lLines.end(), [=]( std::string aLine ) 
+           { uint32_t lI( 0 ); EXPECT_EQ( "\033[31m" + aLine + "\033[0m", lRule->apply( aLine, ++lI ) );  });
+
+}
+
 
 }} // namespace Color::ColorTest
 
