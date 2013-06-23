@@ -1,21 +1,9 @@
 #include <iostream>
+#include <boost/regex.hpp>
 
 #include "colorCommandLine.hxx"
+#include "utils.hh"
 
-namespace Color {
-
-auto RED = "\033[31m";
-auto BOLD_RED = "\033[1;31m";
-auto RESET = "\033[0m";
-
-typedef std::string colorname;
-
-void color( colorname col, std::string& txt, std::ostream& stream )
-{
-    stream << col << txt << RESET;
-}
-
-} // namespace Color
 void usage()
 {
     std::cerr << "usage: color [options]" << std::endl << "options:" << std::endl;
@@ -26,22 +14,32 @@ int main( int argc, char* argv[] )
 {
     try 
     {   
-            int end; // End of options.
-            options opt( argc, argv, end);
+        int end; // End of options.
+        options opt( argc, argv, end);
 
-            if ( opt.help() )
-            {   
-                usage();
-                return 0;
-            }   
+        if ( opt.help() )
+        {   
+            usage();
+            return 0;
+        }   
 
         auto lRegexp = opt.regexp();
-        auto lWholeLines = opt.f();
+        const boost::regex lMatcher("[0-9]", boost::regex_constants::basic);
+        const std::string  lColor = "A&AA";
+
         std::string lLine;
-        while (std::getline(std::cin, lLine))
+        while ( std::getline(std::cin, lLine ) )
         {
-            Color::color(Color::BOLD_RED, lLine, std::cout );
-            std::cout << std::endl;
+            std::cout << boost::regex_replace( lLine, lMatcher, Color::colorizeString< Color::RED >  ) << std::endl;
+            //{
+            //    //std::cerr << *lBegin << " " << *lEnd << std::endl;
+            //    Color::color(Color::BOLD_RED, lLine, std::cout );
+            //}
+            //else
+            //{
+            //    std::cout << lLine;
+            //}
+        std::cout << std::endl;
         }
         return 0;
     }

@@ -3,7 +3,8 @@ option(BUILD_TESTS "Build all of unit tests." FALSE)
 project (color)
 
 add_subdirectory(CMake)
-
+FIND_PACKAGE( Boost 1.40 COMPONENTS regex program_options REQUIRED )
+INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
 
 
 # Set default build type
