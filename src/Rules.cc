@@ -25,7 +25,13 @@ std::string Rule::apply( const std::string& aLine, uint64_t aLineNumber ) const
 {
     if ( mWholeLines )
     {
-        return "";
+        if ( boost::regex_search( aLine, mRegex ) )
+        {
+            std::stringstream lStream;
+            color( mColor, aLine, lStream );
+            return lStream.str();
+        }
+        return aLine; 
     }
     else
     {
