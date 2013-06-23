@@ -5,7 +5,10 @@ namespace Color {
 std::string colorizeString( const boost::smatch aMatch, ColorName aColor )
 {
     std::stringstream lStream;
-    color( aColor, aMatch[0].str(), lStream );
+    if ( aMatch[0].str().size() )
+    {
+        color( aColor, aMatch[0].str(), lStream );
+    }
     return lStream.str();
 }
 
