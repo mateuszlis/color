@@ -30,7 +30,7 @@ int main( int argc, char* argv[] )
         std::string lLine;
         while ( std::getline(std::cin, lLine ) )
         {
-            std::cout << boost::regex_replace( lLine, lMatcher, Color::colorizeString< Color::RED >  ) << std::endl;
+            //std::cout << boost::regex_replace( lLine, lMatcher, Color::colorizeString< Color::RED >  ) << std::endl;
             //{
             //    //std::cerr << *lBegin << " " << *lEnd << std::endl;
             //    Color::color(Color::BOLD_RED, lLine, std::cout );

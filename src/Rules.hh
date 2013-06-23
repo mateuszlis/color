@@ -2,6 +2,7 @@
 
 #include <boost/regex.hpp>
 #include <tr1/memory>
+#include <tr1/functional>
 
 #include "utils.hh"
 
@@ -25,9 +26,10 @@ class Rule : public IRule
         virtual ~Rule() {}
 
     protected:
-        bool mWholeLines;
-        ColorName mColor;
-        boost::regex mRegex;
+        const bool mWholeLines;
+        const ColorName mColor;
+        const boost::regex mRegex;
+        const std::tr1::function< std::string( const boost::smatch ) > mColorizer;
 
 }; // class Rule
 

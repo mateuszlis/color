@@ -17,12 +17,5 @@ enum ColorName
 
 void color( ColorName aCol, const std::string& aTxt, std::ostream& aStream );
 
-template < ColorName TCOLOR >
-std::string colorizeString( const boost::smatch aMatch )
-{
-    std::stringstream lStream;
-    color( TCOLOR, aMatch[0].str(), lStream );
-    return lStream.str();
-}
 
 } // namespace Color
