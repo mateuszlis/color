@@ -43,12 +43,18 @@ NumberRule::NumberRule( const uint8_t aSimilarLinesCount, const ColorName aIniti
     : mSimilarLinesCount( aSimilarLinesCount )
       , mColors()
 {
-    ;
+    if ( !mSimilarLinesCount )
+        throw std::runtime_error( "Number of similar lines cannot be zero" );
+    mColors.push_back(aInitialColor);
 }
 
 std::string NumberRule::apply( const std::string& aLine, uint64_t aLineNumber ) const
 {
-    return "";
+    const uint16_t lColorIndex( ( aLineNumber / mSimilarLinesCount ) % mColors.size() );
+    const ColorName lColor( mColors[ lColorIndex ] );
+    std::stringstream lStream;
+    color( lColor, aLine, lStream );
+    return lStream.str();
 }
 
 

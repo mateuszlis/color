@@ -77,7 +77,7 @@ TEST( RuleTest, colorize_whole_lines_with_numbers )
 
 TEST( NumberRuleTest, one_color )
 {
-    const uint8_t lLinesCount( 0 );
+    const uint8_t lLinesCount( 1 );
     NumberRule::Ptr lRule( new NumberRule( lLinesCount, RED ) );
     
     std::vector< std::string > lLines;
@@ -98,6 +98,12 @@ TEST( NumberRuleTest, one_color )
 
 }
 
+TEST( NumberRuleTest, zero_color_error )
+{
+    const uint8_t lLinesCount( 0 );
+    NumberRule::Ptr lRule;
+    ASSERT_THROW(lRule = NumberRule::Ptr( new NumberRule( lLinesCount, RED ) ), std::runtime_error);
+}
 
 }} // namespace Color::ColorTest
 
