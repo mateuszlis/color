@@ -12,6 +12,10 @@ enum ColorName
 {
     RED = 0
         , BOLD_RED
+        , BROWN
+        , BOLD_BROWN
+        , CYAN
+        , BOLD_CYAN
         , RESET
 };
 

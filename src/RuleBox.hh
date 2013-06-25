@@ -15,7 +15,7 @@ class RuleBox
     public: // functions
         RuleBox();
         void addRule( const IRule::Ptr& aRule );
-        std::string process( const std::string& aText );
+        std::string process( const std::string& aText, const uint64_t aLineNumber = 0 );
 
     protected: // fields
         std::list< IRule::Ptr > mRules;
