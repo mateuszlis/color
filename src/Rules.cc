@@ -2,12 +2,12 @@
 
 namespace Color {
 
-std::string colorizeString( const boost::smatch aMatch, ColorName aColor )
+std::string colorizeString( const boost::smatch aMatch, ColorName aColor, ColorName aResetCol = RESET )
 {
     std::stringstream lStream;
     if ( aMatch[0].str().size() )
     {
-        color( aColor, aMatch[0].str(), lStream );
+        color( aColor, aMatch[0].str(), lStream, aResetCol );
     }
     return lStream.str();
 }
@@ -16,27 +16,27 @@ Rule::Rule( ColorName aColor, const std::string& aRegex, bool aWholeLines )
     : mWholeLines( aWholeLines )
       , mColor( aColor )
       , mRegex( aRegex )
-      , mColorizer( std::tr1::bind( colorizeString
-                    , std::tr1::placeholders::_1, mColor ) )
     {
     }
 
 
-std::string Rule::apply( const std::string& aLine, uint64_t /*aLineNumber*/ ) const
+std::string Rule::apply( const std::string& aLine, ColorName& aResetCol, uint64_t /*aLineNumber*/ ) const
 {
     if ( mWholeLines )
     {
         if ( boost::regex_search( aLine, mRegex ) )
         {
             std::stringstream lStream;
-            color( mColor, aLine, lStream );
+            color( mColor, aLine, lStream, aResetCol );
             return lStream.str();
         }
         return aLine; 
     }
     else
     {
-        return boost::regex_replace( aLine, mRegex, mColorizer );
+        Colorizer lColorizer = std::tr1::bind( colorizeString
+                , std::tr1::placeholders::_1, mColor, aResetCol );
+        return boost::regex_replace( aLine, mRegex, lColorizer );
     }
 }
 
@@ -54,12 +54,13 @@ void NumberRule::addColor( const ColorName aColor )
     mColors.push_back( aColor );
 }
 
-std::string NumberRule::apply( const std::string& aLine, uint64_t aLineNumber ) const
+std::string NumberRule::apply( const std::string& aLine, ColorName& aResetCol, uint64_t aLineNumber ) const
 {
     const uint16_t lColorIndex( ( aLineNumber / mSimilarLinesCount ) % mColors.size() );
     const ColorName lColor( mColors[ lColorIndex ] );
     std::stringstream lStream;
     color( lColor, aLine, lStream );
+    aResetCol = lColor; // it will be passed to the next rule
     return lStream.str();
 }
 

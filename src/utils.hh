@@ -19,7 +19,7 @@ enum ColorName
         , RESET
 };
 
-void color( ColorName aCol, const std::string& aTxt, std::ostream& aStream );
+void color( ColorName aCol, const std::string& aTxt, std::ostream& aStream, ColorName resetCol = RESET );
 
 
 } // namespace Color

@@ -13,9 +13,9 @@ const char* COLOR_NAMES[]
         , "\033[0m"
 };
 
-void color( ColorName aCol, const std::string& aTxt, std::ostream& aStream )
+void color( ColorName aCol, const std::string& aTxt, std::ostream& aStream, ColorName resetCol )
 {
-    aStream << COLOR_NAMES[aCol] << aTxt << COLOR_NAMES[RESET];
+    aStream << COLOR_NAMES[aCol] << aTxt << COLOR_NAMES[resetCol];
 }
 
 

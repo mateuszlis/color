@@ -31,8 +31,9 @@ TEST( RuleTest, colorize_only_numbers_in_the_middle_of_text )
     const std::string lRegex( "[0-9]+" );
 
     Rule::Ptr lRule( new Rule( RED, lRegex ) );
+    ColorName lReset( RESET );
     std::string lMiddleText( "This is text with numbers 1212 12 ha" );
-    std::string lResult( lRule->apply( lMiddleText ) );
+    std::string lResult( lRule->apply( lMiddleText, lReset ) );
     EXPECT_EQ( lResult
             , std::string( 
                 "This is text with numbers \033[31m1212\033[0m \033[31m12\033[0m ha" ) );
@@ -43,8 +44,9 @@ TEST( RuleTest, colorize_everything )
     const std::string lRegex( ".*" );
 
     Rule::Ptr lRule( new Rule( RED, lRegex ) );
+    ColorName lReset( RESET );
     std::string lMiddleText( "This is text with numbers 1212 12 ha" );
-    std::string lResult( lRule->apply( lMiddleText ) );
+    std::string lResult( lRule->apply( lMiddleText, lReset ) );
     EXPECT_EQ( lResult
             , std::string( 
                 "\033[31mThis is text with numbers 1212 12 ha\033[0m" ) );
@@ -61,17 +63,18 @@ TEST( RuleTest, colorize_whole_lines_with_numbers )
     std::string lThirdLine( "third line" );
     std::string lFourthLine( "4 line" );
 
-    std::string lResult( lRule->apply( lFirstLine ) );
+    ColorName lReset( RESET );
+    std::string lResult( lRule->apply( lFirstLine, lReset ) );
     EXPECT_EQ( lResult, lFirstLine );
 
-    lResult = lRule->apply( lSecondLine );
+    lResult = lRule->apply( lSecondLine, lReset );
     EXPECT_EQ( lResult
             , std::string( "\033[31m" + lSecondLine + "\033[0m" ) );
 
-    lResult = lRule->apply( lThirdLine );
+    lResult = lRule->apply( lThirdLine, lReset );
     EXPECT_EQ( lResult, lThirdLine );
 
-    lResult = lRule->apply( lFourthLine );
+    lResult = lRule->apply( lFourthLine, lReset );
     EXPECT_EQ( lResult
             , std::string( "\033[31m" + lFourthLine + "\033[0m" ) );
 }
@@ -94,8 +97,11 @@ TEST( NumberRuleTest, one_color )
         lLines.push_back( lStream.str() );
     }
 
-   for_each(lLines.begin(), lLines.end(), [=]( std::string aLine ) 
-           { uint32_t lI( 0 ); EXPECT_EQ( "\033[31m" + aLine + "\033[0m", lRule->apply( aLine, ++lI ) );  });
+    for_each(lLines.begin(), lLines.end(), [=]( std::string aLine ) 
+           { uint32_t lI( 0 )
+            ; ColorName lBackCol
+            ; EXPECT_EQ( "\033[31m" + aLine + "\033[0m"
+                , lRule->apply( aLine, lBackCol, ++lI ) );  });
 
 }
 
@@ -115,14 +121,15 @@ TEST( NumberRuleTest, two_colors )
     std::vector< std::string > lLines;
     std::string lBaseLine( "This is a Line" );
 
+    ColorName lBackCol;
     for ( int lI( 0 ) ; lI < lLinesCount ; ++lI )
     {
-        EXPECT_EQ( lRule->apply(lBaseLine, lI ), "\033[31m" + lBaseLine + "\033[0m" );
+        EXPECT_EQ( lRule->apply(lBaseLine, lBackCol, lI ), "\033[31m" + lBaseLine + "\033[0m" );
     }
 
     for ( int lI( 3 ) ; lI < 2 * lLinesCount ; ++lI )
     {
-        EXPECT_EQ( lRule->apply(lBaseLine, lI ), "\033[1;31m" + lBaseLine + "\033[0m" );
+        EXPECT_EQ( lRule->apply(lBaseLine, lBackCol, lI ), "\033[1;31m" + lBaseLine + "\033[0m" );
     }
 }
 
