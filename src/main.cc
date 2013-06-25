@@ -13,7 +13,7 @@ void usage()
 int main( int argc, char* argv[] )
 {
     try 
-    {   
+    {
         int end; // End of options.
         options opt( argc, argv, end);
 
