@@ -83,7 +83,7 @@ TEST( NumberRuleTest, one_color )
     std::vector< std::string > lLines;
     std::string lBaseLine( "This is a Line" );
     
-    typedef uint16_t testedType;
+    typedef uint8_t testedType;
     for ( testedType lI( 0 ) 
             ; lI < std::numeric_limits< testedType >::max() 
             ; ++lI )
@@ -103,6 +103,26 @@ TEST( NumberRuleTest, zero_color_error )
     const uint8_t lLinesCount( 0 );
     NumberRule::Ptr lRule;
     ASSERT_THROW(lRule = NumberRule::Ptr( new NumberRule( lLinesCount, RED ) ), std::runtime_error);
+}
+
+TEST( NumberRuleTest, two_colors )
+{
+    const uint8_t lLinesCount( 3 );
+    NumberRule::Ptr lRule( new NumberRule( lLinesCount, RED ) );
+    lRule->addColor( BOLD_RED );
+
+    std::vector< std::string > lLines;
+    std::string lBaseLine( "This is a Line" );
+
+    for ( int lI( 0 ) ; lI < lLinesCount ; ++lI )
+    {
+        EXPECT_EQ( lRule->apply(lBaseLine, lI ), "\033[31m" + lBaseLine + "\033[0m" );
+    }
+
+    for ( int lI( 3 ) ; lI < 2 * lLinesCount ; ++lI )
+    {
+        EXPECT_EQ( lRule->apply(lBaseLine, lI ), "\033[1;31m" + lBaseLine + "\033[0m" );
+    }
 }
 
 }} // namespace Color::ColorTest

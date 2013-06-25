@@ -21,7 +21,8 @@ Rule::Rule( ColorName aColor, const std::string& aRegex, bool aWholeLines )
     {
     }
 
-std::string Rule::apply( const std::string& aLine, uint64_t aLineNumber ) const
+
+std::string Rule::apply( const std::string& aLine, uint64_t /*aLineNumber*/ ) const
 {
     if ( mWholeLines )
     {
@@ -46,6 +47,11 @@ NumberRule::NumberRule( const uint8_t aSimilarLinesCount, const ColorName aIniti
     if ( !mSimilarLinesCount )
         throw std::runtime_error( "Number of similar lines cannot be zero" );
     mColors.push_back(aInitialColor);
+}
+
+void NumberRule::addColor( const ColorName aColor )
+{
+    mColors.push_back( aColor );
 }
 
 std::string NumberRule::apply( const std::string& aLine, uint64_t aLineNumber ) const
