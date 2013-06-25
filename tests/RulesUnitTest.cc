@@ -17,6 +17,7 @@
 // project-local
 #include "utils.hh"
 #include "Rules.hh"
+#include "RuleBox.hh"
 
 namespace Color { namespace Test {
 

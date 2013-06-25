@@ -3,7 +3,7 @@ find_package(GTest REQUIRED)
 include_directories(gmock-1.6.0/gtest/include)
 include_directories(gmock-1.6.0/include)
 include_directories(${BASE_SRC_DIR})
-add_executable (RulesTest RulesUnitTest.cc )
+add_executable (RulesTest RulesUnitTest.cc RuleBoxUnitTest.cc )
 #every test has its own valgrind version
 #so it is easy to turn off time-consuming valgrind tests in ctest while
 #debugging

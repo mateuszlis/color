@@ -10,7 +10,7 @@ namespace Color {
 class RuleBox
 {
     public: // typedefs
-        std::tr1::shared_ptr< RuleBox > Ptr;
+        typedef std::tr1::shared_ptr< RuleBox > Ptr;
 
     public: // functions
         RuleBox();
