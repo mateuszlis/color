@@ -20,24 +20,26 @@ Rule::Rule( ColorName aColor, const std::string& aRegex, bool aWholeLines )
     }
 
 
-std::string Rule::apply( const std::string& aLine, ColorName& aResetCol, uint64_t /*aLineNumber*/ ) const
+void Rule::apply( const std::string& aLine
+        , IntermediateResult& aResContainer
+        , uint64_t aLineNumber ) const
 {
-    if ( mWholeLines )
-    {
-        if ( boost::regex_search( aLine, mRegex ) )
-        {
-            std::stringstream lStream;
-            color( mColor, aLine, lStream, aResetCol );
-            return lStream.str();
-        }
-        return aLine; 
-    }
-    else
-    {
-        Colorizer lColorizer = std::tr1::bind( colorizeString
-                , std::tr1::placeholders::_1, mColor, aResetCol );
-        return boost::regex_replace( aLine, mRegex, lColorizer );
-    }
+//    if ( mWholeLines )
+//    {
+//        if ( boost::regex_search( aLine, mRegex ) )
+//        {
+//            std::stringstream lStream;
+//            color( mColor, aLine, lStream, aResetCol );
+//            return lStream.str();
+//        }
+//        return aLine; 
+//    }
+//    else
+//    {
+//        Colorizer lColorizer = std::tr1::bind( colorizeString
+//                , std::tr1::placeholders::_1, mColor, aResetCol );
+//        return boost::regex_replace( aLine, mRegex, lColorizer );
+//    }
 }
 
 NumberRule::NumberRule( const uint8_t aSimilarLinesCount, const ColorName aInitialColor ) 
@@ -54,14 +56,16 @@ void NumberRule::addColor( const ColorName aColor )
     mColors.push_back( aColor );
 }
 
-std::string NumberRule::apply( const std::string& aLine, ColorName& aResetCol, uint64_t aLineNumber ) const
+void NumberRule::apply( const std::string& aLine
+        , IntermediateResult& aResContainer
+        , uint64_t aLineNumber ) const
 {
-    const uint16_t lColorIndex( ( aLineNumber / mSimilarLinesCount ) % mColors.size() );
-    const ColorName lColor( mColors[ lColorIndex ] );
-    std::stringstream lStream;
-    color( lColor, aLine, lStream );
-    aResetCol = lColor; // it will be passed to the next rule
-    return lStream.str();
+//    const uint16_t lColorIndex( ( aLineNumber / mSimilarLinesCount ) % mColors.size() );
+//    const ColorName lColor( mColors[ lColorIndex ] );
+//    std::stringstream lStream;
+//    color( lColor, aLine, lStream );
+//    aResetCol = lColor; // it will be passed to the next rule
+//    return lStream.str();
 }
 
 
