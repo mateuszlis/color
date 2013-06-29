@@ -31,10 +31,10 @@ TEST( RuleBox, AddRule )
     RuleBox::Ptr lRuleBox( new RuleBox );
     
     const uint8_t lLinesCount( 3 );
-    NumberRule::Ptr lRule1( new NumberRule( lLinesCount, BROWN ) );
+    NumberRule::Ptr lRule1( new NumberRule( BROWN, 0 ) );
     lRule1->addColor( CYAN );
     const std::string lRegex( "[0-9]+" );
-    IRule::Ptr lRule2( new Rule( RED, lRegex ) );
+    IRule::Ptr lRule2( new Rule( RED, lRegex, 1 ) );
 
     lRuleBox->addRule( lRule1 );
     lRuleBox->addRule( lRule2 );

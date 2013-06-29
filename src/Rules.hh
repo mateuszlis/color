@@ -7,18 +7,20 @@
 #include "utils.hh"
 
 namespace Color {
+
+typedef uint32_t RuleIndex;
+
 class IntermediateResult
 {
     public: // typedefs
         typedef std::tr1::shared_ptr< IntermediateResult > Ptr;
-        typedef uint32_t RuleIndex;
         typedef std::pair< bool, RuleIndex > Marker; ///< open/close, ruleIndex
 
     public: // functions
         IntermediateResult() {}
         virtual ~IntermediateResult() {}
-        void putMarker( size_t aIndex, RuleIndex aRuleIndex );
-        void getMarkers( size_t aIndex, std::vector< RuleIndex >& aRules ) const;
+        virtual void putMarker( size_t aIndex, RuleIndex aRuleIndex );
+        virtual void getMarkers( size_t aIndex, std::vector< RuleIndex >& aRules ) const;
 }; // class IntermediateResult
 
 class IRule
@@ -27,9 +29,14 @@ class IRule
         typedef std::tr1::shared_ptr< IRule > Ptr;
 
     public: // functions
+        explicit IRule( const RuleIndex aIndex ) : m_Index( aIndex ) {}
         virtual void apply( const std::string& aLine
                 , IntermediateResult& aResContainer
                 , uint64_t aLineNumber = 0 ) const = 0;
+
+    protected: // fields
+        const RuleIndex m_Index;
+
 }; // class IRule
 
 class Rule : public IRule
@@ -39,16 +46,16 @@ class Rule : public IRule
         typedef std::tr1::function< std::string( const boost::smatch ) > Colorizer;
 
     public: // functions
-        explicit Rule( ColorName aColor, const std::string& aRegex, bool aWholeLines = false );
+        explicit Rule( ColorName aColor, const std::string& aRegex, const RuleIndex aIndex, bool aWholeLines = false );
         virtual void apply( const std::string& aLine
                 , IntermediateResult& aResContainer
                 , uint64_t aLineNumber = 0 ) const;
         virtual ~Rule() {}
 
     protected:
-        const bool mWholeLines;
-        const ColorName mColor;
-        const boost::regex mRegex;
+        const bool m_WholeLines;
+        const ColorName m_Color;
+        const boost::regex m_Regex;
 
 }; // class Rule
 
@@ -58,8 +65,9 @@ class NumberRule : public IRule
         typedef std::tr1::shared_ptr< NumberRule > Ptr;
 
     public: // functions
-        explicit NumberRule( const uint8_t aSimilarLinesCount = 2
-                , const ColorName aInitialColor = ColorName::RED );
+        explicit NumberRule( const ColorName aInitialColor
+                , const RuleIndex aIndex 
+                , const uint8_t aSimilarLinesCount = 2 );
         void addColor( const ColorName aColor );
         virtual void apply( const std::string& aLine
                 , IntermediateResult& aResContainer
@@ -67,8 +75,8 @@ class NumberRule : public IRule
         virtual ~NumberRule() {}
 
     protected:
-        const uint8_t mSimilarLinesCount;
-        std::vector< ColorName > mColors;
+        const uint8_t m_SimilarLinesCount;
+        std::vector< ColorName > m_Colors;
 }; // class NumberRule
 
 } // namespace Color

@@ -18,27 +18,32 @@
 #include "utils.hh"
 #include "Rules.hh"
 #include "RuleBox.hh"
+#include "mocks.hh"
 
 namespace Color { namespace Test {
 
-//TEST( RuleTest, Construct )
-//{
-//    Rule::Ptr lRule( new Rule( RED, "[0-9]+" ) );
-//}
-//
-//TEST( RuleTest, colorize_only_numbers_in_the_middle_of_text )
-//{
-//    const std::string lRegex( "[0-9]+" );
-//
-//    Rule::Ptr lRule( new Rule( RED, lRegex ) );
-//    ColorName lReset( RESET );
-//    std::string lMiddleText( "This is text with numbers 1212 12 ha" );
-//    std::string lResult( lRule->apply( lMiddleText, lReset ) );
-//    EXPECT_EQ( lResult
-//            , std::string( 
-//                "This is text with numbers \033[31m1212\033[0m \033[31m12\033[0m ha" ) );
-//}
-//
+TEST( RuleTest, Construct )
+{
+    Rule::Ptr lRule( new Rule( RED, "[0-9]+", 0 ) );
+}
+
+TEST( RuleTest, colorize_only_numbers_in_the_middle_of_text )
+{
+    const std::string lRegex( "[0-9]+" );
+    const RuleIndex lIndex( 0 );
+
+    Rule::Ptr lRule( new Rule( RED, lRegex, lIndex ) );
+    ColorName lReset( RESET );
+    MockIntermediateResult lIResult;
+    EXPECT_CALL( lIResult, putMarker( 26, lIndex ) );
+    EXPECT_CALL( lIResult, putMarker( 30, lIndex ) );
+    EXPECT_CALL( lIResult, putMarker( 31, lIndex ) );
+    EXPECT_CALL( lIResult, putMarker( 34, lIndex ) );
+
+    std::string lMiddleText( "This is text with numbers 1212 12 ha" );
+    lRule->apply( lMiddleText, lIResult );
+}
+
 //TEST( RuleTest, colorize_everything )
 //{
 //    const std::string lRegex( ".*" );

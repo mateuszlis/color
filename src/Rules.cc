@@ -12,10 +12,19 @@ std::string colorizeString( const boost::smatch aMatch, ColorName aColor, ColorN
     return lStream.str();
 }
 
-Rule::Rule( ColorName aColor, const std::string& aRegex, bool aWholeLines ) 
-    : mWholeLines( aWholeLines )
-      , mColor( aColor )
-      , mRegex( aRegex )
+void IntermediateResult::putMarker( size_t aIndex, RuleIndex aRuleIndex )
+{
+}
+
+void IntermediateResult::getMarkers( size_t aIndex, std::vector< RuleIndex >& aRules ) const
+{
+}
+
+Rule::Rule( ColorName aColor, const std::string& aRegex, const RuleIndex aIndex, bool aWholeLines ) 
+    : IRule( aIndex )
+      , m_WholeLines( aWholeLines )
+      , m_Color( aColor )
+      , m_Regex( aRegex )
     {
     }
 
@@ -42,18 +51,21 @@ void Rule::apply( const std::string& aLine
 //    }
 }
 
-NumberRule::NumberRule( const uint8_t aSimilarLinesCount, const ColorName aInitialColor ) 
-    : mSimilarLinesCount( aSimilarLinesCount )
-      , mColors()
+NumberRule::NumberRule( const ColorName aInitialColor
+        , const RuleIndex aRuleIndex 
+        , const uint8_t aSimilarLinesCount ) 
+    : IRule( aRuleIndex )
+      , m_SimilarLinesCount( aSimilarLinesCount )
+      , m_Colors()
 {
-    if ( !mSimilarLinesCount )
+    if ( !m_SimilarLinesCount )
         throw std::runtime_error( "Number of similar lines cannot be zero" );
-    mColors.push_back(aInitialColor);
+    m_Colors.push_back(aInitialColor);
 }
 
 void NumberRule::addColor( const ColorName aColor )
 {
-    mColors.push_back( aColor );
+    m_Colors.push_back( aColor );
 }
 
 void NumberRule::apply( const std::string& aLine
