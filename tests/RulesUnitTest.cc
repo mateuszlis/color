@@ -41,7 +41,7 @@ TEST( RuleTest, colorize_only_numbers_in_the_middle_of_text )
     EXPECT_CALL( lIResult, putMarker( 26, RED ) );
     EXPECT_CALL( lIResult, putMarker( 30, RED ) );
     EXPECT_CALL( lIResult, putMarker( 31, RED ) );
-    EXPECT_CALL( lIResult, putMarker( 34, RED ) );
+    EXPECT_CALL( lIResult, putMarker( 33, RED ) );
 
     std::string lMiddleText( "This is text with numbers 1212 12 ha" );
     lRule->apply( lMiddleText, lIResult );
@@ -100,7 +100,7 @@ TEST( NumberRuleTest, one_color )
     
     typedef uint8_t testedType;
     for ( testedType lI( 0 ) 
-            ; lI < std::numeric_limits< testedType >::max() 
+            ; lI < std::numeric_limits< testedType >::max() / 20
             ; ++lI )
     {
         std::stringstream lStream;
@@ -143,7 +143,7 @@ TEST( NumberRuleTest, two_colors )
     
     typedef uint8_t testedType;
     for ( testedType lI( 0 ) 
-            ; lI < std::numeric_limits< testedType >::max() 
+            ; lI < std::numeric_limits< testedType >::max() / 20
             ; ++lI )
     {
         std::stringstream lStream;
@@ -159,7 +159,6 @@ TEST( NumberRuleTest, two_colors )
             ; lRule->apply( aLine, lIResult, ++lI ); } );
 
 }
-
 
 
 }} // namespace Color::ColorTest

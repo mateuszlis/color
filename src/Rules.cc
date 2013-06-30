@@ -14,6 +14,7 @@ std::string colorizeString( const boost::smatch aMatch, ColorName aColor, ColorN
 
 void IntermediateResult::putMarker( size_t aIndex, const ColorName aColor )
 {
+    std::cout << "AAA" << std::endl;
 }
 
 void IntermediateResult::getMarkers( size_t aIndex, std::vector< const Marker >& aRules ) const
@@ -33,22 +34,28 @@ void Rule::apply( const std::string& aLine
         , IntermediateResult& aResContainer
         , uint64_t aLineNumber ) const
 {
-//    if ( mWholeLines )
-//    {
-//        if ( boost::regex_search( aLine, mRegex ) )
-//        {
-//            std::stringstream lStream;
-//            color( mColor, aLine, lStream, aResetCol );
-//            return lStream.str();
-//        }
-//        return aLine; 
-//    }
-//    else
-//    {
-//        Colorizer lColorizer = std::tr1::bind( colorizeString
-//                , std::tr1::placeholders::_1, mColor, aResetCol );
-//        return boost::regex_replace( aLine, mRegex, lColorizer );
-//    }
+    if ( m_WholeLines )
+    {
+        if ( boost::regex_search( aLine, m_Regex ) )
+        {
+            aResContainer.putMarker( 0, m_Color );
+            aResContainer.putMarker( aLine.size(), m_Color );
+        }
+    }
+    else
+    {
+        boost::smatch lSearchRes;
+        size_t lGlobal( 0 );
+        std::string::const_iterator lStart( aLine.begin() )
+                                    , lEnd( aLine.end() );
+        while ( boost::regex_search( lStart, lEnd, lSearchRes, m_Regex ) )
+        {
+            aResContainer.putMarker( lGlobal + lSearchRes.position(), m_Color );
+            aResContainer.putMarker( lGlobal + lSearchRes.position() + lSearchRes.length(), m_Color );
+            lStart += lSearchRes.position() + lSearchRes.length();
+            lGlobal += lSearchRes.position() + lSearchRes.length();
+        }
+    }
 }
 
 NumberRule::NumberRule( const ColorName aInitialColor
