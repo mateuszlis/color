@@ -14,13 +14,13 @@ class IntermediateResult
 {
     public: // typedefs
         typedef std::tr1::shared_ptr< IntermediateResult > Ptr;
-        typedef std::pair< bool, RuleIndex > Marker; ///< open/close, ruleIndex
+        typedef std::pair< bool, ColorName > Marker; ///< open/close, ruleIndex
 
     public: // functions
         IntermediateResult() {}
         virtual ~IntermediateResult() {}
-        virtual void putMarker( size_t aIndex, RuleIndex aRuleIndex );
-        virtual void getMarkers( size_t aIndex, std::vector< RuleIndex >& aRules ) const;
+        virtual void putMarker( size_t aIndex, const ColorName aColor );
+        virtual void getMarkers( size_t aIndex, std::vector< const Marker >& aRules ) const;
 }; // class IntermediateResult
 
 class IRule

@@ -12,11 +12,11 @@ std::string colorizeString( const boost::smatch aMatch, ColorName aColor, ColorN
     return lStream.str();
 }
 
-void IntermediateResult::putMarker( size_t aIndex, RuleIndex aRuleIndex )
+void IntermediateResult::putMarker( size_t aIndex, const ColorName aColor )
 {
 }
 
-void IntermediateResult::getMarkers( size_t aIndex, std::vector< RuleIndex >& aRules ) const
+void IntermediateResult::getMarkers( size_t aIndex, std::vector< const Marker >& aRules ) const
 {
 }
 
