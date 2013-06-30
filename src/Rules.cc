@@ -36,25 +36,37 @@ void Rule::apply( const std::string& aLine
 {
     if ( m_WholeLines )
     {
-        if ( boost::regex_search( aLine, m_Regex ) )
-        {
-            aResContainer.putMarker( 0, m_Color );
-            aResContainer.putMarker( aLine.size(), m_Color );
-        }
+        applyWholeLine( aLine, aResContainer );
     }
     else
     {
-        boost::smatch lSearchRes;
-        size_t lGlobal( 0 );
-        std::string::const_iterator lStart( aLine.begin() )
-                                    , lEnd( aLine.end() );
-        while ( boost::regex_search( lStart, lEnd, lSearchRes, m_Regex ) )
-        {
-            aResContainer.putMarker( lGlobal + lSearchRes.position(), m_Color );
-            aResContainer.putMarker( lGlobal + lSearchRes.position() + lSearchRes.length(), m_Color );
-            lStart += lSearchRes.position() + lSearchRes.length();
-            lGlobal += lSearchRes.position() + lSearchRes.length();
-        }
+        applyPartial( aLine, aResContainer );
+    }
+}
+
+void Rule::applyWholeLine( const std::string& aLine
+                        , IntermediateResult& aResContainer ) const
+{
+    if ( boost::regex_search( aLine, m_Regex ) )
+    {
+        aResContainer.putMarker( 0, m_Color );
+        aResContainer.putMarker( aLine.size(), m_Color );
+    }
+}
+
+void Rule::applyPartial( const std::string& aLine
+                        , IntermediateResult& aResContainer ) const
+{
+    boost::smatch lSearchRes;
+    size_t lGlobal( 0 );
+    std::string::const_iterator lStart( aLine.begin() )
+                                , lEnd( aLine.end() );
+    while ( boost::regex_search( lStart, lEnd, lSearchRes, m_Regex ) )
+    {
+        aResContainer.putMarker( lGlobal + lSearchRes.position(), m_Color );
+        aResContainer.putMarker( lGlobal + lSearchRes.position() + lSearchRes.length(), m_Color );
+        lStart += lSearchRes.position() + lSearchRes.length();
+        lGlobal += lSearchRes.position() + lSearchRes.length();
     }
 }
 

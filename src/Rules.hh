@@ -52,7 +52,12 @@ class Rule : public IRule
                 , uint64_t aLineNumber = 0 ) const;
         virtual ~Rule() {}
 
-    protected:
+    protected: // functions
+        void applyWholeLine( const std::string& aLIne
+                , IntermediateResult& aResContainer ) const;
+        void applyPartial( const std::string& aLIne
+                , IntermediateResult& aResContainer ) const;
+    protected: // fields
         const bool m_WholeLines;
         const ColorName m_Color;
         const boost::regex m_Regex;
