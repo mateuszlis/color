@@ -20,10 +20,7 @@ IntermediateResult::IntermediateResult( const size_t aSize )
 
 void IntermediateResult::putMarker( size_t aIndex, const ColorName aColor )
 {
-    while ( aIndex >= m_RulesOnPositions.size() )
-    {
-        m_RulesOnPositions.resize( 2 * m_RulesOnPositions.size() );
-    }
+    increaseSize( aIndex );
     m_RulesOnPositions[ aIndex ].push_back( Marker( m_IsOpened, aColor ) );
     m_IsOpened = !m_IsOpened; 
 }
@@ -37,6 +34,14 @@ void IntermediateResult::getMarkers( size_t aIndex, Markers& aRules ) const
     return aRules.insert( aRules.end()
                         , m_RulesOnPositions[ aIndex ].begin()
                         , m_RulesOnPositions[ aIndex ].end() );
+}
+
+void IntermediateResult::increaseSize( const size_t aSize )
+{
+    while ( aSize >= m_RulesOnPositions.size() )
+    {
+        m_RulesOnPositions.resize( 2 * m_RulesOnPositions.size() );
+    }
 }
 
 Rule::Rule( ColorName aColor, const std::string& aRegex, const RuleIndex aIndex, bool aWholeLines ) 

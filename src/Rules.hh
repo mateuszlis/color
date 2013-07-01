@@ -23,6 +23,8 @@ class IntermediateResult
         virtual void putMarker( size_t aIndex, const ColorName aColor );
         virtual void getMarkers( size_t aIndex, Markers& aRules ) const;
 
+    protected: // functions
+        void increaseSize( const size_t aSize );
     protected: // fields
         static const size_t RESERVED_SIZE = 1000;
         std::vector< Markers > m_RulesOnPositions;
