@@ -165,7 +165,8 @@ TEST( IntermediateResultTest, SingleRule_Extended_Position )
     size_t lFirstMarker( 0 )
          , lSecondMarker( 2 )
          , lThirdMarker( 10 )
-         , lLastMarker( 11 );
+         , lLastMarker( 11 )
+         , lCrazyNumber( 10000 );
 
     lIResult->putMarker( lFirstMarker, RED );
     lIResult->putMarker( lSecondMarker, RED );
@@ -192,6 +193,10 @@ TEST( IntermediateResultTest, SingleRule_Extended_Position )
     ASSERT_EQ( lMarkersRef.size(), ONE );
     EXPECT_EQ( lMarkersRef.front().first, CLOSE );
     EXPECT_EQ( lMarkersRef.front().second, RED );
+    lMarkersRef.clear();
+
+    ASSERT_NO_THROW( lIResult->getMarkers( lCrazyNumber, lMarkersRef ) );
+    ASSERT_EQ( lMarkersRef.size(), ZERO );
     lMarkersRef.clear();
 }
 
