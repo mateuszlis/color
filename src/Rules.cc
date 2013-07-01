@@ -14,15 +14,29 @@ std::string colorizeString( const boost::smatch aMatch, ColorName aColor, ColorN
 
 IntermediateResult::IntermediateResult( const size_t aSize ) 
     : m_RulesOnPositions( aSize )
+      , m_IsOpened( false )
 {}
 
 
 void IntermediateResult::putMarker( size_t aIndex, const ColorName aColor )
 {
+    while ( aIndex >= m_RulesOnPositions.size() )
+    {
+        m_RulesOnPositions.resize( 2 * m_RulesOnPositions.size() );
+    }
+    m_RulesOnPositions[ aIndex ].push_back( Marker( m_IsOpened, aColor ) );
+    m_IsOpened = !m_IsOpened; 
 }
 
 void IntermediateResult::getMarkers( size_t aIndex, Markers& aRules ) const
 {
+    if ( aIndex > m_RulesOnPositions.size() )
+    {
+        return;
+    }
+    return aRules.insert( aRules.end()
+                        , m_RulesOnPositions[ aIndex ].begin()
+                        , m_RulesOnPositions[ aIndex ].end() );
 }
 
 Rule::Rule( ColorName aColor, const std::string& aRegex, const RuleIndex aIndex, bool aWholeLines ) 

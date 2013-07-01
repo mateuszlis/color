@@ -26,6 +26,7 @@ class IntermediateResult
     protected: // fields
         static const size_t RESERVED_SIZE = 1000;
         std::vector< Markers > m_RulesOnPositions;
+        bool m_IsOpened;
 
 }; // class IntermediateResult
 
