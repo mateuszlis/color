@@ -18,10 +18,15 @@ class IntermediateResult
         typedef std::vector< Marker > Markers;
 
     public: // functions
-        IntermediateResult() {}
+        explicit IntermediateResult( const size_t aSize = RESERVED_SIZE );
         virtual ~IntermediateResult() {}
         virtual void putMarker( size_t aIndex, const ColorName aColor );
         virtual void getMarkers( size_t aIndex, Markers& aRules ) const;
+
+    protected: // fields
+        static const size_t RESERVED_SIZE = 1000;
+        std::vector< Markers > m_RulesOnPositions;
+
 }; // class IntermediateResult
 
 class IRule
