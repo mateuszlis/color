@@ -157,6 +157,44 @@ TEST( IntermediateResultTest, MultipleRules )
     lMarkersRef.clear();
 }
 
+TEST( IntermediateResultTest, SingleRule_Extended_Position )
+{
+    InSequence dummy;
+    const size_t MAX_SIZE( 5 );
+    IntermediateResult::Ptr lIResult( new IntermediateResult( MAX_SIZE ) );
+    size_t lFirstMarker( 0 )
+         , lSecondMarker( 2 )
+         , lThirdMarker( 10 )
+         , lLastMarker( 11 );
+
+    lIResult->putMarker( lFirstMarker, RED );
+    lIResult->putMarker( lSecondMarker, RED );
+    lIResult->putMarker( lThirdMarker, RED );
+    lIResult->putMarker( lLastMarker, RED );
+    IntermediateResult::Markers lMarkersRef;
+
+    ASSERT_NO_THROW( lIResult->getMarkers( lFirstMarker, lMarkersRef ) );
+    ASSERT_EQ( lMarkersRef.size(), ONE );
+    EXPECT_EQ( lMarkersRef.front().first, OPEN );
+    EXPECT_EQ( lMarkersRef.front().second, RED );
+    lMarkersRef.clear();
+    ASSERT_NO_THROW( lIResult->getMarkers( lSecondMarker, lMarkersRef ) );
+    ASSERT_EQ( lMarkersRef.size(), ONE );
+    EXPECT_EQ( lMarkersRef.front().first, CLOSE );
+    EXPECT_EQ( lMarkersRef.front().second, RED );
+    lMarkersRef.clear();
+    ASSERT_NO_THROW( lIResult->getMarkers( lThirdMarker, lMarkersRef ) );
+    ASSERT_EQ( lMarkersRef.size(), ONE );
+    EXPECT_EQ( lMarkersRef.front().first, OPEN );
+    EXPECT_EQ( lMarkersRef.front().second, RED );
+    lMarkersRef.clear();
+    ASSERT_NO_THROW( lIResult->getMarkers( lLastMarker, lMarkersRef ) );
+    ASSERT_EQ( lMarkersRef.size(), ONE );
+    EXPECT_EQ( lMarkersRef.front().first, CLOSE );
+    EXPECT_EQ( lMarkersRef.front().second, RED );
+    lMarkersRef.clear();
+}
+
 
 }} // namespace Color::ColorTest
 
