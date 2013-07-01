@@ -92,12 +92,10 @@ void NumberRule::apply( const std::string& aLine
         , IntermediateResult& aResContainer
         , uint64_t aLineNumber ) const
 {
-//    const uint16_t lColorIndex( ( aLineNumber / mSimilarLinesCount ) % mColors.size() );
-//    const ColorName lColor( mColors[ lColorIndex ] );
-//    std::stringstream lStream;
-//    color( lColor, aLine, lStream );
-//    aResetCol = lColor; // it will be passed to the next rule
-//    return lStream.str();
+    const uint16_t lColorIndex( ( aLineNumber / m_SimilarLinesCount ) % m_Colors.size() );
+    const ColorName lColor( m_Colors[ lColorIndex ] );
+    aResContainer.putMarker( 0, lColor );
+    aResContainer.putMarker( aLine.size(), lColor );
 }
 
 
