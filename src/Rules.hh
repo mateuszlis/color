@@ -14,7 +14,7 @@ class IntermediateResult
 {
     public: // typedefs
         typedef std::tr1::shared_ptr< IntermediateResult > Ptr;
-        typedef std::pair< bool, ColorName > Marker; ///< open/close, ruleIndex
+        typedef std::pair< bool, ColorName > Marker; ///< isClose, ruleIndex
         typedef std::vector< Marker > Markers;
 
     public: // functions
