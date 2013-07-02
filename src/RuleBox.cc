@@ -3,12 +3,6 @@
 #include <stack>
 namespace Color {
 
-void applyTheRule( std::string& aTextRef, IRule::Ptr aRule, const uint64_t aLineNumber, ColorName& aBackCol )
-{
-    //std::cout << "Applying " << aRule->apply( aTextRef, aBackCol, aLineNumber ) << std::endl;
-    //aTextRef = aRule->apply( aTextRef, aBackCol, aLineNumber );
-}
-
 RuleBox::RuleBox()
 {
     ;
@@ -16,7 +10,7 @@ RuleBox::RuleBox()
 
 void RuleBox::addRule( const IRule::Ptr& aRule )
 {
-    m_Rules.push_back( aRule );
+    m_Rules.push_front( aRule );
 }
 
 std::string RuleBox::process( const std::string& aText, const uint64_t aLineNumber )
@@ -33,13 +27,12 @@ std::string RuleBox::process( const std::string& aText, const uint64_t aLineNumb
     std::for_each( begin( m_Rules ), end( m_Rules ), lProcessor );
 
     std::stringstream lOutput;
-    std::stack< ColorName > lColors;
+    std::list< ColorName > lColors;
     ColorName lCurrentColor( RESET );
     for ( size_t lIndex( 0 ) ; lIndex < aText.size() ; ++lIndex )
     {
         IntermediateResult::Markers lMarkers;
         lIResult.getMarkers( lIndex, lMarkers );
-        ColorName lOpeningColor;
         bool lReset( false );
         if ( !lMarkers.empty() )
         {
@@ -47,14 +40,18 @@ std::string RuleBox::process( const std::string& aText, const uint64_t aLineNumb
             {
                 if ( !lMarkers[ lRuleIndex ].first )
                 {
-                    lColors.push( lMarkers[ lRuleIndex ].second );
-                    lOpeningColor = lColors.top();
+                    lColors.push_front( lMarkers[ lRuleIndex ].second );
                 }
                 else
                 {
-                    if ( lColors.top() == lMarkers[ lRuleIndex ].second )
+                    if ( lColors.front() == lMarkers[ lRuleIndex ].second )
                     {
-                        lColors.pop();
+                        lColors.pop_front(); // ninenty percent of the time
+                    }
+                    else
+                    {
+                        removeFirstOccurence( lMarkers[ lRuleIndex ].second
+                                , lColors );
                     }
                     if ( lColors.empty() )
                     {
@@ -63,16 +60,20 @@ std::string RuleBox::process( const std::string& aText, const uint64_t aLineNumb
                     }
                 }
             }
-            if ( lReset || lCurrentColor != lColors.top() )
+            if ( lReset )
             {
-                lOutput << COLOR_NAMES[ lColors.top() ];
+                lOutput << COLOR_NAMES[ RESET ];
                 lReset = false;
             }
-            lCurrentColor = lColors.top();
+            else if ( lCurrentColor != lColors.front() )
+            {
+                lOutput << COLOR_NAMES[ lColors.front() ];
+            }
+            lCurrentColor = lColors.front();
         }
         lOutput << aText[ lIndex ];
     }
-    if ( !lColors.empty() )
+    if ( !lColors.front() )
         lOutput << COLOR_NAMES[ RESET ];
     return lOutput.str();
 }
@@ -83,6 +84,21 @@ void RuleBox::singleProcess( const IRule::Ptr& aRule
                             , const uint64_t aLineNumber )
 {
     aRule->apply( aLine, aResult, aLineNumber );
+}
+
+void RuleBox::removeFirstOccurence( const ColorName aColor
+                            , std::list< ColorName >& aColors )
+{
+    for ( std::list< ColorName >::iterator lColIt( aColors.begin() )
+            ; lColIt != aColors.end()
+            ; ++lColIt )
+    {
+        if ( *lColIt == aColor )
+        {
+            aColors.erase( lColIt );
+            return;
+        }
+    }
 }
 
 } // namespace Color

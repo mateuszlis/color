@@ -22,6 +22,9 @@ class RuleBox
                         , IntermediateResult& aResult
                         , const std::string& aLine
                         , const uint64_t aLineNumber );
+        void removeFirstOccurence( const ColorName aColor
+                , std::list< ColorName >& aColors );
+
     protected: // fields
         std::list< IRule::Ptr > m_Rules;
 }; // class RuleBox
