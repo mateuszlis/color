@@ -29,9 +29,9 @@ TEST( RuleBox, Construct )
 TEST( RuleBox, AddRule )
 {
     RuleBox::Ptr lRuleBox( new RuleBox );
-    
+
     const uint8_t lLinesCount( 3 );
-    NumberRule::Ptr lRule1( new NumberRule( BROWN, 0 ) );
+    NumberRule::Ptr lRule1( new NumberRule( BROWN, 4, lLinesCount ) );
     lRule1->addColor( CYAN );
     const std::string lRegex( "[0-9]+" );
     IRule::Ptr lRule2( new Rule( RED, lRegex, 1 ) );
@@ -41,15 +41,16 @@ TEST( RuleBox, AddRule )
     const std::string lBaseLine( "This is the 1231 line 12" );
     for ( int lI( 0 ) ; lI < lLinesCount ; ++lI )
         EXPECT_EQ( lRuleBox->process( lBaseLine, lI )
-                , "\033[33m This is the \033[31m1231\033[33m line \033[31m12\033[0m" );
+                , "\033[33mThis is the \033[31m1231\033[33m line \033[31m12\033[0m" )
+            << "Line " << lI << " Not equal";
 
     for ( int lI( lLinesCount ) ; lI < lLinesCount * 2 ; ++lI )
         EXPECT_EQ( lRuleBox->process( lBaseLine, 3 )
-                , "\033[36m This is the \033[31m1231\033[36m line \033[31m12\033[0m" );
+                , "\033[36mThis is the \033[31m1231\033[36m line \033[31m12\033[0m" );
 
     for ( int lI( lLinesCount * 2 ) ; lI < lLinesCount * 3; ++lI )
         EXPECT_EQ( lRuleBox->process( lBaseLine, lI )
-                , "\033[33m This is the \033[31m1231\033[33m line \033[31m12\033[0m" );
+                , "\033[33mThis is the \033[31m1231\033[33m line \033[31m12\033[0m" );
 
 }
 

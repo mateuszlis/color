@@ -10,8 +10,8 @@ INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
 # Set default build type
 message(STATUS "${PROJECT_NAME}: Build type - ${CMAKE_BUILD_TYPE}")
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pipe -fstack-protector-all -Wall -Wextra --std=gnu++11")
-set(CMAKE_CXX_FLAGS_DEBUG "-g")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pipe -fstack-protector-all -Wall -Wextra --std=gnu++11 -g")
+set(CMAKE_CXX_FLAGS_DEBUG "-g") #FIXME
 set(CMAKE_CXX_FLAGS_RELEASE "-O2 -DNO_DEBUG -DNDEBUG -fPIC ")
 
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})

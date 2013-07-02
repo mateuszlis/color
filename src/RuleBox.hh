@@ -17,8 +17,13 @@ class RuleBox
         void addRule( const IRule::Ptr& aRule );
         std::string process( const std::string& aText, const uint64_t aLineNumber = 0 );
 
+    protected: // functions
+        void singleProcess( const IRule::Ptr& aRule
+                        , IntermediateResult& aResult
+                        , const std::string& aLine
+                        , const uint64_t aLineNumber );
     protected: // fields
-        std::list< IRule::Ptr > mRules;
-}; // class RuleBox 
+        std::list< IRule::Ptr > m_Rules;
+}; // class RuleBox
 
 } // namespace Color
