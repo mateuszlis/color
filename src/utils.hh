@@ -16,6 +16,10 @@ enum ColorName
         , BOLD_BROWN
         , CYAN
         , BOLD_CYAN
+        , LIGHT_GRAY
+        , BOLD_LIGHT_GRAY
+        , BLUE
+        , BOLD_BLUE
         , RESET
 };
 

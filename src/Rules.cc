@@ -54,7 +54,7 @@ Rule::Rule( ColorName aColor, const std::string& aRegex, bool aWholeLines )
 
 void Rule::apply( const std::string& aLine
         , IntermediateResult& aResContainer
-        , uint64_t aLineNumber ) const
+        , uint64_t /*aLineNumber*/ ) const
 {
     if ( m_WholeLines )
     {

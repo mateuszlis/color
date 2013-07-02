@@ -3,6 +3,8 @@
 
 #include "colorCommandLine.hxx"
 #include "utils.hh"
+#include "RuleBox.hh"
+#include "Rules.hh"
 
 void usage()
 {
@@ -23,23 +25,22 @@ int main( int argc, char* argv[] )
             return 0;
         }   
 
-        auto lRegexp = opt.regexp();
-        const boost::regex lMatcher("[0-9]", boost::regex_constants::basic);
-        const std::string  lColor = "A&AA";
+        // prototype rules for compilation
+        Color::RuleBox::Ptr lRules( new Color::RuleBox );
+        lRules->addRule( Color::IRule::Ptr( new Color::Rule( Color::BOLD_RED, "error", true ) ) );
+        Color::NumberRule::Ptr lNumberRule( new Color::NumberRule( Color::LIGHT_GRAY, 2 ) );
+        //lNumberRule->addColor( Color::CYAN );
+        lRules->addRule( lNumberRule );
+        lRules->addRule( Color::IRule::Ptr( new Color::Rule( Color::BROWN, "[a-zA-Z_]+\\.hh" ) ) );
+        lRules->addRule( Color::IRule::Ptr( new Color::Rule( Color::BROWN, "[a-zA-Z_]+\\.cc" ) ) );
+        lRules->addRule( Color::IRule::Ptr( new Color::Rule( Color::BOLD_RED, "undefined" ) ) );
+        lRules->addRule( Color::IRule::Ptr( new Color::Rule( Color::BOLD_BLUE, "warning" ) ) );
 
         std::string lLine;
+        size_t lI( 0 );
         while ( std::getline(std::cin, lLine ) )
         {
-            //std::cout << boost::regex_replace( lLine, lMatcher, Color::colorizeString< Color::RED >  ) << std::endl;
-            //{
-            //    //std::cerr << *lBegin << " " << *lEnd << std::endl;
-            //    Color::color(Color::BOLD_RED, lLine, std::cout );
-            //}
-            //else
-            //{
-            //    std::cout << lLine;
-            //}
-        std::cout << std::endl;
+            std::cout << lRules->process( lLine, lI++ ) << std::endl;
         }
         return 0;
     }
