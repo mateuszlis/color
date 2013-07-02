@@ -34,9 +34,8 @@ TEST( RuleTest, Construct )
 TEST( RuleTest, colorize_only_numbers_in_the_middle_of_text )
 {
     const std::string lRegex( "[0-9]+" );
-    const RuleIndex lIndex( 0 );
 
-    Rule::Ptr lRule( new Rule( RED, lRegex, lIndex ) );
+    Rule::Ptr lRule( new Rule( RED, lRegex ) );
     MockIntermediateResult lIResult;
     EXPECT_CALL( lIResult, putMarker( 26, RED ) );
     EXPECT_CALL( lIResult, putMarker( 30, RED ) );
@@ -50,9 +49,8 @@ TEST( RuleTest, colorize_only_numbers_in_the_middle_of_text )
 TEST( RuleTest, colorize_everything )
 {
     const std::string lRegex( ".*" );
-    const RuleIndex lIndex( 0 );
 
-    Rule::Ptr lRule( new Rule( RED, lRegex, lIndex ) );
+    Rule::Ptr lRule( new Rule( RED, lRegex  ) );
     std::string lMiddleText( "This is text with numbers 1212 12 ha" );
     MockIntermediateResult lIResult;
     EXPECT_CALL( lIResult, putMarker( 0, RED ) );
@@ -64,9 +62,8 @@ TEST( RuleTest, colorize_whole_lines_with_numbers )
 {
     const bool lColorizeWholeLines( true );
     const std::string lRegex( "[0-9]+" );
-    const RuleIndex lIndex( 0 );
     InSequence dummy;
-    Rule::Ptr lRule( new Rule( RED, lRegex, lIndex, lColorizeWholeLines ) );
+    Rule::Ptr lRule( new Rule( RED, lRegex, lColorizeWholeLines ) );
     MockIntermediateResult lIResult;
 
     std::string lFirstLine( "§ first line " );
@@ -92,8 +89,7 @@ TEST( NumberRuleTest, one_color )
 {
     InSequence dummy;
     const uint8_t lLinesCount( 1 );
-    const RuleIndex lIndex( 0 );
-    NumberRule::Ptr lRule( new NumberRule( RED, lIndex, lLinesCount ) );
+    NumberRule::Ptr lRule( new NumberRule( RED, lLinesCount ) );
     
     std::vector< std::string > lLines;
     std::string lBaseLine( "This is a Line" );
@@ -122,11 +118,9 @@ TEST( NumberRuleTest, zero_color_error )
     InSequence dummy;
     const uint8_t lLinesCount( 0 );
     NumberRule::Ptr lRule;
-    const RuleIndex lIndex( 0 );
     ASSERT_THROW( lRule 
             = NumberRule::Ptr( 
                 new NumberRule( RED
-                                , lIndex
                                 , lLinesCount ) )
                   , std::runtime_error);
 }
@@ -134,9 +128,8 @@ TEST( NumberRuleTest, zero_color_error )
 TEST( NumberRuleTest, two_colors )
 {
     const uint8_t lLinesCount( 3 );
-    const RuleIndex lIndex( 0 );
     InSequence dummy;
-    NumberRule::Ptr lRule( new NumberRule( RED, lIndex, lLinesCount ) );
+    NumberRule::Ptr lRule( new NumberRule( RED, lLinesCount ) );
     
     std::vector< std::string > lLines;
     std::string lBaseLine( "This is a Line" );

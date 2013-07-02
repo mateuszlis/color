@@ -44,9 +44,8 @@ void IntermediateResult::increaseSize( const size_t aSize )
     }
 }
 
-Rule::Rule( ColorName aColor, const std::string& aRegex, const RuleIndex aIndex, bool aWholeLines ) 
-    : IRule( aIndex )
-      , m_WholeLines( aWholeLines )
+Rule::Rule( ColorName aColor, const std::string& aRegex, bool aWholeLines ) 
+    : m_WholeLines( aWholeLines )
       , m_Color( aColor )
       , m_Regex( aRegex )
     {
@@ -95,10 +94,8 @@ void Rule::applyPartial( const std::string& aLine
 }
 
 NumberRule::NumberRule( const ColorName aInitialColor
-        , const RuleIndex aRuleIndex 
         , const uint8_t aSimilarLinesCount ) 
-    : IRule( aRuleIndex )
-      , m_SimilarLinesCount( aSimilarLinesCount )
+    :  m_SimilarLinesCount( aSimilarLinesCount )
       , m_Colors()
 {
     if ( !m_SimilarLinesCount )

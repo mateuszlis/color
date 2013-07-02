@@ -8,8 +8,6 @@
 
 namespace Color {
 
-typedef uint32_t RuleIndex;
-
 class IntermediateResult
 {
     public: // typedefs
@@ -38,13 +36,10 @@ class IRule
         typedef std::tr1::shared_ptr< IRule > Ptr;
 
     public: // functions
-        explicit IRule( const RuleIndex aIndex ) : m_Index( aIndex ) {}
+        explicit IRule() {}
         virtual void apply( const std::string& aLine
                 , IntermediateResult& aResContainer
                 , uint64_t aLineNumber = 0 ) const = 0;
-
-    protected: // fields
-        const RuleIndex m_Index;
 
 }; // class IRule
 
@@ -55,7 +50,7 @@ class Rule : public IRule
         typedef std::tr1::function< std::string( const boost::smatch ) > Colorizer;
 
     public: // functions
-        explicit Rule( ColorName aColor, const std::string& aRegex, const RuleIndex aIndex, bool aWholeLines = false );
+        explicit Rule( ColorName aColor, const std::string& aRegex, bool aWholeLines = false );
         virtual void apply( const std::string& aLine
                 , IntermediateResult& aResContainer
                 , uint64_t aLineNumber = 0 ) const;
@@ -80,7 +75,6 @@ class NumberRule : public IRule
 
     public: // functions
         explicit NumberRule( const ColorName aInitialColor
-                , const RuleIndex aIndex 
                 , const uint8_t aSimilarLinesCount = 2 );
         void addColor( const ColorName aColor );
         virtual void apply( const std::string& aLine

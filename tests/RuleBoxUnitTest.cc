@@ -26,15 +26,15 @@ TEST( RuleBox, Construct )
     RuleBox::Ptr lRuleBox( new RuleBox );
 }
 
-TEST( RuleBox, AddRule )
+TEST( RuleBox, MixOfRuleAndNumberRule )
 {
     RuleBox::Ptr lRuleBox( new RuleBox );
 
     const uint8_t lLinesCount( 3 );
-    NumberRule::Ptr lRule1( new NumberRule( BROWN, 4, lLinesCount ) );
+    NumberRule::Ptr lRule1( new NumberRule( BROWN, lLinesCount ) );
     lRule1->addColor( CYAN );
     const std::string lRegex( "[0-9]+" );
-    IRule::Ptr lRule2( new Rule( RED, lRegex, 1 ) );
+    IRule::Ptr lRule2( new Rule( RED, lRegex ) );
 
     lRuleBox->addRule( lRule1 );
     lRuleBox->addRule( lRule2 );
@@ -54,5 +54,24 @@ TEST( RuleBox, AddRule )
 
 }
 
+TEST( RuleBox, OverlappingRules )
+{
+    RuleBox::Ptr lRuleBox( new RuleBox );
+
+    const std::string lRegex1( "abcdef" )
+                    , lRegex2( "defghijk" );
+
+    IRule::Ptr lRule1( new Rule( BROWN, lRegex1 ) );
+    IRule::Ptr lRule2( new Rule( CYAN, lRegex2 ) );
+
+    lRuleBox->addRule( lRule1 );
+    lRuleBox->addRule( lRule2 );
+    const std::string lBaseLine( " abcdefghijklmnop " );
+
+    std::string lExp( " \033[33mabc\033[36mdefghijk\033[0mlmnop " );
+    std::string lResult( lRuleBox->process( lBaseLine ) );
+    EXPECT_EQ( lResult, lExp )
+        << " Not equal exp:[" << lExp << "] res:[" << lResult << "]" ;
+}
 }} // namespace Color::ColorTest
 
