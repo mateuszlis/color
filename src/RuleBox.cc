@@ -41,7 +41,7 @@ std::string RuleBox::process( const std::string& aText, const uint64_t aLineNumb
         lIResult.getMarkers( lIndex, lMarkers );
         ColorName lOpeningColor;
         bool lReset( false );
-        if ( lMarkers.size() )
+        if ( !lMarkers.empty() )
         {
             for ( size_t lRuleIndex( 0 ) ; lRuleIndex < lMarkers.size() ; ++lRuleIndex )
             {
