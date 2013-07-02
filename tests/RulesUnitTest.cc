@@ -117,11 +117,7 @@ TEST( NumberRuleTest, zero_color_error )
 {
     InSequence dummy;
     const uint8_t lLinesCount( 0 );
-    NumberRule::Ptr lRule;
-    ASSERT_THROW( lRule 
-            = NumberRule::Ptr( 
-                new NumberRule( RED
-                                , lLinesCount ) )
+    ASSERT_THROW( NumberRule( RED, lLinesCount )
                   , std::runtime_error);
 }
 

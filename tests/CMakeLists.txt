@@ -9,7 +9,7 @@ add_executable (RulesTest RulesUnitTest.cc IntermediateResultUnitTest.cc RuleBox
 #debugging
 add_test(RulesTest ${EXECUTABLE_OUTPUT_PATH}/RulesTest)
 add_test(RulesTest|Valgrind valgrind --leak-check=full
-    --undef-value-errors=no -v --error-exitcode=1 ${EXECUTABLE_OUTPUT_PATH}/RulesTest) 
+    --undef-value-errors=no -v --error-exitcode=1 ${EXECUTABLE_OUTPUT_PATH}/RulesTest --gtest_filter=-*zero_color_error*) 
 #cppcheck
 add_test(cppcheckInfo  cppcheck ${BASE_SRC_DIR} --error-exitcode=1 --enable=information -q )
 add_test(cppcheckUnusedFunctions  cppcheck ${BASE_SRC_DIR} --error-exitcode=1 --enable=unusedFunction -q )
