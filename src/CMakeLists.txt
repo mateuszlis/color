@@ -1,5 +1,6 @@
 add_library(commandLine colorCommandLine.cxx)
 add_library(Rules utils.cc Rules.cc RuleBox.cc)
+add_library(Config Config.cc)
 add_executable(color utils.cc main.cc)
 install(TARGETS color DESTINATION bin)
-target_link_libraries(color commandLine Rules ${Boost_LIBRARIES})
+target_link_libraries(color commandLine Config Rules ${Boost_LIBRARIES})

@@ -29,7 +29,7 @@ int main( int argc, char* argv[] )
         // prototype rules for compilation
         Color::RuleBox::Ptr lRules( new Color::RuleBox );
         lRules->addRule( Color::IRule::Ptr( new Color::Rule( Color::BOLD_RED, "error", false ) ) );
-        Color::NumberRule::Ptr lNumberRule( new Color::NumberRule( Color::LIGHT_GRAY, 2 ) );
+        Color::NumberRule::Ptr lNumberRule( new Color::NumberRule( Color::CYAN, 2 ) );
         lNumberRule->addColor( Color::RESET );
         lRules->addRule( lNumberRule );
         lRules->addRule( Color::IRule::Ptr( new Color::Rule( Color::BROWN, "[a-zA-Z_]+\\.hh" ) ) );

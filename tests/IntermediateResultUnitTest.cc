@@ -1,9 +1,3 @@
-/*
- * RulesUnitTest.cc
- *
- *  Created on: 23-06-2013
- *      Author: lisu
- */
 // std
 #include <iostream>
 #include <limits>
