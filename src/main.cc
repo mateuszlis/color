@@ -37,6 +37,8 @@ int main( int argc, char* argv[] )
         lRules->addRule( Color::IRule::Ptr( new Color::Rule( Color::BOLD_RED, "undefined" ) ) );
         lRules->addRule( Color::IRule::Ptr( new Color::Rule( Color::BOLD_BLUE, "warning" ) ) );
         std::string lLine;
+
+        // handle stdin with timeout
         fd_set selectset;
         struct timeval timeout = {1,0}; //timeout of 10 secs.
         int ret;

@@ -41,16 +41,16 @@ TEST( RuleBox, MixOfRuleAndNumberRule )
     const std::string lBaseLine( "This is the 1231 line 12" );
     for ( int lI( 0 ) ; lI < lLinesCount ; ++lI )
         EXPECT_EQ( lRuleBox->process( lBaseLine, lI )
-                , "\033[33mThis is the \033[31m1231\033[33m line \033[31m12\033[0m" )
+                , "\033[0;33mThis is the \033[0;31m1231\033[0;33m line \033[0;31m12\033[0;0m" )
             << "Line " << lI << " Not equal";
 
     for ( int lI( lLinesCount ) ; lI < lLinesCount * 2 ; ++lI )
         EXPECT_EQ( lRuleBox->process( lBaseLine, 3 )
-                , "\033[36mThis is the \033[31m1231\033[36m line \033[31m12\033[0m" );
+                , "\033[0;36mThis is the \033[0;31m1231\033[0;36m line \033[0;31m12\033[0;0m" );
 
     for ( int lI( lLinesCount * 2 ) ; lI < lLinesCount * 3; ++lI )
         EXPECT_EQ( lRuleBox->process( lBaseLine, lI )
-                , "\033[33mThis is the \033[31m1231\033[33m line \033[31m12\033[0m" );
+                , "\033[0;33mThis is the \033[0;31m1231\033[0;33m line \033[0;31m12\033[0;0m" );
 
 }
 
@@ -68,7 +68,7 @@ TEST( RuleBox, OverlappingRules )
     lRuleBox->addRule( lRule2 );
     const std::string lBaseLine( " abcdefghijklmnop " );
 
-    std::string lExp( " \033[33mabc\033[36mdefghijk\033[0mlmnop " );
+    std::string lExp( " \033[0;33mabc\033[0;36mdefghijk\033[0;0mlmnop " );
     std::string lResult( lRuleBox->process( lBaseLine ) );
     EXPECT_EQ( lResult, lExp )
         << " Not equal exp:[" << lExp << "] res:[" << lResult << "]" ;

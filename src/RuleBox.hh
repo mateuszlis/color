@@ -1,6 +1,6 @@
 #pragma once
 
-#include <tr1/memory>
+#include <memory>
 
 #include "utils.hh"
 #include "Rules.hh"
@@ -10,7 +10,7 @@ namespace Color {
 class RuleBox
 {
     public: // typedefs
-        typedef std::tr1::shared_ptr< RuleBox > Ptr;
+        typedef std::shared_ptr< RuleBox > Ptr;
 
     public: // functions
         RuleBox();
