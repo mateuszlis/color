@@ -21,7 +21,7 @@ RuleBox::Ptr createRuleBox()
 }
 
 Config::Config( std::istream& aFile )
-    : m_Rules() 
+    : m_Rules()
     , m_CreateRule( &ruleWrapper )
     , m_CreateNumberRule( &numberRuleWrapper )
     , m_CreateRuleBox( &createRuleBox )

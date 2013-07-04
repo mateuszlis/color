@@ -35,7 +35,16 @@ class MockRuleProducer
                 , RuleBox::Ptr( void ) );
 }; // class MockRuleProducer
 
+class MockRuleBox : public RuleBox
+{
+    public: // typedefs
+        typedef std::shared_ptr< MockRuleBox > Ptr;
 
+    public: // functions
+        MOCK_METHOD1( addRule
+                , void( const IRule::Ptr& ) );
+
+}; // class MockRuleBox
                 
 }  // namespace Color
 

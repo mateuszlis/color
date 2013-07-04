@@ -14,8 +14,8 @@ class RuleBox
 
     public: // functions
         RuleBox();
-        void addRule( const IRule::Ptr& aRule );
-        std::string process( const std::string& aText
+        virtual void addRule( const IRule::Ptr& aRule );
+        virtual std::string process( const std::string& aText
                 , const uint64_t aLineNumber = 0 ) const;
 
     protected: // functions supporting processing
