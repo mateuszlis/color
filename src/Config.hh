@@ -12,10 +12,14 @@ class Config
     public: // constants
         static const char COMMENT_SIGN = '#';
         static const boost::regex RULE_BOX_REG;
+        static const boost::regex NUMBER_RULE_REG;
+        static const uint8_t OMIT_FIRST_BRACKET = 1;
+        static const uint8_t NUMBER_OF_BRACKETS_RULEBOX = 2;
 
     public: // typedefs
         typedef std::shared_ptr< Config > Ptr;
-        typedef std::map< std::string, RuleBox > RuleMap;
+        typedef std::map< std::string, RuleBox::Ptr > RuleMap;
+        typedef std::pair< std::string, RuleBox::Ptr > RuleMapElem;
         typedef std::function< Rule::Ptr( ColorName
                 , const std::string&, bool ) > RuleCreator;
         typedef std::function< NumberRule::Ptr( ColorName

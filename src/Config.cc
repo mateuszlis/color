@@ -4,6 +4,7 @@
 namespace Color {
 
 const boost::regex Config::RULE_BOX_REG = boost::regex( "\\[[a-zA-Z0-9]\\]" );
+const boost::regex Config::NUMBER_RULE_REG = boost::regex( "alternate=[0-9]+:(\[(RED|GREEN|BLUE)\],)*\[(RED|GREEN|BLUE)\]" );
 // helper wrappers for constructors of rules
 Rule::Ptr ruleWrapper( ColorName aColor, const std::string& aRegex
         , bool aWholeLine )
@@ -63,6 +64,16 @@ void Config::parseConfig( std::istream& aStr )
             if( boost::regex_match( lLine, RULE_BOX_REG ) )
             {
                 lCurrentRuleBox = m_CreateRuleBox();
+                m_Rules.insert( 
+                        RuleMapElem( lLine.substr(
+                                        OMIT_FIRST_BRACKET
+                                        , lLine.size() - NUMBER_OF_BRACKETS_RULEBOX )
+                            , lCurrentRuleBox ) );
+            }
+            else if ( boost::regex_match( lLine, NUMBER_RULE_REG ) )
+            {
+                //NumberRule::Ptr lRule( m_CreateNumberRule(
+
             }
 
         }
