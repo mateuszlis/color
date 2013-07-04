@@ -9,6 +9,9 @@ namespace Color {
 
 class Config
 {
+    public: // constants
+        static const char COMMENT_SIGN = '#';
+
     public: // typedefs
         typedef std::shared_ptr< Config > Ptr;
         typedef std::map< std::string, RuleBox > RuleMap;
@@ -27,6 +30,9 @@ class Config
 
         virtual const RuleBox::Ptr getRuleBox( const std::string& aName ) const;
         virtual const RuleMap& getAllRules() const;
+
+    protected: // functions
+        void parseConfig( std::istream& aStr );
 
     protected: // fields
         RuleMap m_Rules;

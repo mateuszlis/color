@@ -26,9 +26,7 @@ Config::Config( std::istream& aFile )
     , m_CreateNumberRule( &numberRuleWrapper )
     , m_CreateRuleBox( &createRuleBox )
 {
-    char* a = new char[ 100 ];
-    aFile.getline( a, 100 );
-    delete a;
+    parseConfig( aFile );
 }
 
 Config::Config( std::istream& aFile
@@ -40,6 +38,7 @@ Config::Config( std::istream& aFile
     , m_CreateNumberRule( aNumberRuleCreator )
     , m_CreateRuleBox( aRuleBoxCreator )
 {
+    parseConfig( aFile );
 }
 const RuleBox::Ptr Config::getRuleBox( const std::string& aName ) const
 {
@@ -49,6 +48,12 @@ const RuleBox::Ptr Config::getRuleBox( const std::string& aName ) const
 const Config::RuleMap& Config::getAllRules() const
 {
     return m_Rules;
+}
+
+void Config::parseConfig( std::istream& aStr )
+{
+    std::string lLine;
+    std::getline( aStr, lLine, COMMENT_SIGN );
 }
 
 } // namespace Color
