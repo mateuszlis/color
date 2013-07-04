@@ -29,6 +29,7 @@ class ConfigTest : public ::testing::Test
         MockRuleProducer m_RuleProducer;
         Config::RuleCreator m_RuleCreator;
         Config::NumberRuleCreator m_NumberRuleCreator;
+        Config::RuleBoxCreator m_RuleBoxCreator;
     protected: // functions
         virtual void SetUp() 
         {
@@ -43,6 +44,14 @@ class ConfigTest : public ::testing::Test
                     , &m_RuleProducer
                     , std::placeholders::_1
                     , std::placeholders::_2 );
+            m_RuleBoxCreator = std::bind(
+                    &MockRuleProducer::produceRuleBox
+                    , &m_RuleProducer );
+        }
+
+        Config* createConfig( std::istream& aStr )
+        {
+            return new Config( aStr, m_RuleCreator, m_NumberRuleCreator, m_RuleBoxCreator );
         }
 
 }; // class ConfigTest
@@ -65,7 +74,8 @@ TEST_F( ConfigTest, SingleBoxWithSingleRegexRule )
         .Times( 1 )
         .WillOnce( Return( Rule::Ptr( new Rule( RED, REGEX, false ) ) ) );
 
-    Config::Ptr lConfig( new Config( lStr ) );
+    Config::Ptr lConfig( createConfig( lStr ) );
+
     ASSERT_EQ( lConfig->getAllRules().size(), ONE ) 
         << " Number of rules in file should be 1";
     RuleBox::Ptr lRuleBox;
@@ -85,7 +95,7 @@ TEST_F( ConfigTest, SingleBoxWithSingleNumberRule )
         .WillOnce( Return( lMockRule ) );
     EXPECT_CALL( *lMockRule, addColor( BROWN ) ).Times( 1 );
 
-    Config::Ptr lConfig( new Config( lStr ) );
+    Config::Ptr lConfig( createConfig( lStr ) );
     ASSERT_EQ( lConfig->getAllRules().size(), ONE ) 
         << " Number of rules in file should be 1";
     RuleBox::Ptr lRuleBox;
@@ -104,7 +114,7 @@ TEST_F( ConfigTest, SingleBoxWithSingleRule_WholeLine )
         .Times( 1 )
         .WillOnce( Return( Rule::Ptr( new Rule( RED, REGEX, true ) ) ) );
 
-    Config::Ptr lConfig( new Config( lStr ) );
+    Config::Ptr lConfig( createConfig( lStr ) );
     ASSERT_EQ( lConfig->getAllRules().size(), ONE ) 
         << " Number of rules in file should be 1";
     RuleBox::Ptr lRuleBox;
@@ -134,7 +144,7 @@ TEST_F( ConfigTest, MultipleBoxesMultipleRules )
         .Times( 1 )
         .WillOnce( Return( NumberRule::Ptr( new NumberRule( BLUE, 3 ) ) ) );
 
-    Config::Ptr lConfig( new Config( lStr ) );
+    Config::Ptr lConfig( createConfig( lStr ) );
     ASSERT_EQ( lConfig->getAllRules().size(), TWO ) 
         << " Number of rules in file should be 1";
     RuleBox::Ptr lRuleBox;

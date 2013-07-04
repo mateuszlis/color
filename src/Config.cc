@@ -15,16 +15,32 @@ NumberRule::Ptr numberRuleWrapper( ColorName aColor
     return NumberRule::Ptr( new NumberRule( aColor, aLinesNum ) );
 }
 
+RuleBox::Ptr createRuleBox()
+{
+    return RuleBox::Ptr( new RuleBox );
+}
+
 Config::Config( std::istream& aFile )
     : m_Rules() 
     , m_CreateRule( &ruleWrapper )
     , m_CreateNumberRule( &numberRuleWrapper )
+    , m_CreateRuleBox( &createRuleBox )
 {
     char* a = new char[ 100 ];
     aFile.getline( a, 100 );
     delete a;
 }
 
+Config::Config( std::istream& aFile
+        , RuleCreator aRuleCreator
+        , NumberRuleCreator aNumberRuleCreator
+        , RuleBoxCreator aRuleBoxCreator )
+    : m_Rules()
+    , m_CreateRule( aRuleCreator )
+    , m_CreateNumberRule( aNumberRuleCreator )
+    , m_CreateRuleBox( aRuleBoxCreator )
+{
+}
 const RuleBox::Ptr Config::getRuleBox( const std::string& aName ) const
 {
     return RuleBox::Ptr( new RuleBox );
@@ -35,13 +51,4 @@ const Config::RuleMap& Config::getAllRules() const
     return m_Rules;
 }
 
-void Config::setRuleFactory( Config::RuleCreator aRuleCreator )
-{
-    m_CreateRule = aRuleCreator;
-}
-
-void Config::setNumberRuleFactory( Config::NumberRuleCreator aNumberRuleCreator )
-{
-    m_CreateNumberRule = aNumberRuleCreator; 
-}
 } // namespace Color

@@ -31,6 +31,8 @@ class MockRuleProducer
                     , bool ) );
         MOCK_METHOD2( produceNumberRule
                 , NumberRule::Ptr( ColorName, const uint8_t ) );
+        MOCK_METHOD0( produceRuleBox
+                , RuleBox::Ptr( void ) );
 }; // class MockRuleProducer
 
 
