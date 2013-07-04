@@ -28,7 +28,7 @@ class ConfigTest : public ::testing::Test
     protected: // fields
         MockRuleProducer m_RuleProducer;
         Config::RuleCreator m_RuleCreator;
-        std::function< NumberRule::Ptr( ColorName, const uint8_t ) > m_NumberRuleCreator;
+        Config::NumberRuleCreator m_NumberRuleCreator;
     protected: // functions
         virtual void SetUp() 
         {
@@ -71,12 +71,99 @@ TEST_F( ConfigTest, SingleBoxWithSingleRegexRule )
     RuleBox::Ptr lRuleBox;
     ASSERT_NO_THROW( lRuleBox = lConfig->getRuleBox( RULE_NAME ) ) 
         << "RuleBox " << RULE_NAME << " not found";
-
-    
 }
 
+TEST_F( ConfigTest, SingleBoxWithSingleNumberRule )
+{
+    const std::string RULE_NAME( "BoxName" );
+    std::istringstream lStr( "[" + RULE_NAME + "]\n"
+            "alternate=3:[BLUE],[BROWN]\n" );
 
+    MockNumberRule::Ptr lMockRule( new MockNumberRule );
+    EXPECT_CALL( m_RuleProducer, produceNumberRule( BLUE, 3 ) )
+        .Times( 1 )
+        .WillOnce( Return( lMockRule ) );
+    EXPECT_CALL( *lMockRule, addColor( BROWN ) ).Times( 1 );
 
+    Config::Ptr lConfig( new Config( lStr ) );
+    ASSERT_EQ( lConfig->getAllRules().size(), ONE ) 
+        << " Number of rules in file should be 1";
+    RuleBox::Ptr lRuleBox;
+    ASSERT_NO_THROW( lRuleBox = lConfig->getRuleBox( RULE_NAME ) ) 
+        << "RuleBox " << RULE_NAME << " not found";
+}
+
+TEST_F( ConfigTest, SingleBoxWithSingleRule_WholeLine )
+{
+    const std::string RULE_NAME( "BoxName" );
+    std::istringstream lStr(  "[" + RULE_NAME + "]\n"
+        "color_full_line=[RED]:" + REGEX + "\n"
+        );
+    
+    EXPECT_CALL( m_RuleProducer, produceRule( RED, REGEX, true ) )
+        .Times( 1 )
+        .WillOnce( Return( Rule::Ptr( new Rule( RED, REGEX, true ) ) ) );
+
+    Config::Ptr lConfig( new Config( lStr ) );
+    ASSERT_EQ( lConfig->getAllRules().size(), ONE ) 
+        << " Number of rules in file should be 1";
+    RuleBox::Ptr lRuleBox;
+    ASSERT_NO_THROW( lRuleBox = lConfig->getRuleBox( RULE_NAME ) ) 
+        << "RuleBox " << RULE_NAME << " not found";
+}
+
+TEST_F( ConfigTest, MultipleBoxesMultipleRules )
+{
+    const std::string RULE_NAME( "BoxName" ), SECOND_RULE( "Name" );
+    std::istringstream lStr(  "[" + RULE_NAME + "]\n"
+        "color_full_line=[RED]:" + REGEX + "\n"
+        "color=[BROWN]:" + REGEX + "\n"
+        "\n"
+        "\n"
+        "[" + SECOND_RULE + "]\n"
+        "\n"
+        "alternate=3:[BLUE],[BROWN]\n" );
+    
+    EXPECT_CALL( m_RuleProducer, produceRule( RED, REGEX, true ) )
+        .Times( 1 )
+        .WillOnce( Return( Rule::Ptr( new Rule( RED, REGEX, true ) ) ) );
+    EXPECT_CALL( m_RuleProducer, produceRule( BROWN, REGEX, false ) )
+        .Times( 1 )
+        .WillOnce( Return( Rule::Ptr( new Rule( BROWN, REGEX, false ) ) ) );
+    EXPECT_CALL( m_RuleProducer, produceNumberRule( BLUE, 3 ) )
+        .Times( 1 )
+        .WillOnce( Return( NumberRule::Ptr( new NumberRule( BLUE, 3 ) ) ) );
+
+    Config::Ptr lConfig( new Config( lStr ) );
+    ASSERT_EQ( lConfig->getAllRules().size(), TWO ) 
+        << " Number of rules in file should be 1";
+    RuleBox::Ptr lRuleBox;
+    ASSERT_NO_THROW( lRuleBox = lConfig->getRuleBox( RULE_NAME ) ) 
+        << "RuleBox " << RULE_NAME << " not found";
+    ASSERT_NO_THROW( lRuleBox = lConfig->getRuleBox( SECOND_RULE ) ) 
+        << "RuleBox " << RULE_NAME << " not found";
+}
+
+TEST_F( ConfigTest, ConfigWithComments )
+{
+
+}
+
+// wrong rule name
+// 
+// spaces
+//
+// wrong color name
+//
+// wrong prefix name
+//
+// empty rules
+//
+// every supported color
+//
+// too many rules
+//
+// too many boxes
 
 }} // namespace Color::ColorTest
 
