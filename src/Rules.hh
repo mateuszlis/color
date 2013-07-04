@@ -1,8 +1,8 @@
 #pragma once
 
 #include <boost/regex.hpp>
-#include <tr1/memory>
-#include <tr1/functional>
+#include <memory>
+#include <functional>
 
 #include "utils.hh"
 
@@ -11,7 +11,7 @@ namespace Color {
 class IntermediateResult
 {
     public: // typedefs
-        typedef std::tr1::shared_ptr< IntermediateResult > Ptr;
+        typedef std::shared_ptr< IntermediateResult > Ptr;
         typedef std::pair< bool, ColorName > Marker; ///< isClose, ruleIndex
         typedef std::vector< Marker > Markers;
 
@@ -33,7 +33,7 @@ class IntermediateResult
 class IRule
 {
     public: // typedefs
-        typedef std::tr1::shared_ptr< IRule > Ptr;
+        typedef std::shared_ptr< IRule > Ptr;
 
     public: // functions
         explicit IRule() {}
@@ -46,8 +46,8 @@ class IRule
 class Rule : public IRule
 {
     public: // typedefs
-        typedef std::tr1::shared_ptr< Rule > Ptr;
-        typedef std::tr1::function< std::string( const boost::smatch ) > Colorizer;
+        typedef std::shared_ptr< Rule > Ptr;
+        typedef std::function< std::string( const boost::smatch ) > Colorizer;
 
     public: // functions
         explicit Rule( ColorName aColor, const std::string& aRegex, bool aWholeLines = false );
@@ -71,12 +71,12 @@ class Rule : public IRule
 class NumberRule : public IRule
 {
     public: // typedefs
-        typedef std::tr1::shared_ptr< NumberRule > Ptr;
+        typedef std::shared_ptr< NumberRule > Ptr;
 
     public: // functions
         explicit NumberRule( const ColorName aInitialColor
                 , const uint8_t aSimilarLinesCount = 2 );
-        void addColor( const ColorName aColor );
+        virtual void addColor( const ColorName aColor );
         virtual void apply( const std::string& aLine
                 , IntermediateResult& aResContainer
                 , uint64_t aLineNumber = 0 ) const;
