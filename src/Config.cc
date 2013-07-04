@@ -2,6 +2,8 @@
 
 
 namespace Color {
+
+const boost::regex Config::RULE_BOX_REG = boost::regex( "\\[[a-zA-Z0-9]\\]" );
 // helper wrappers for constructors of rules
 Rule::Ptr ruleWrapper( ColorName aColor, const std::string& aRegex
         , bool aWholeLine )
@@ -53,7 +55,22 @@ const Config::RuleMap& Config::getAllRules() const
 void Config::parseConfig( std::istream& aStr )
 {
     std::string lLine;
-    std::getline( aStr, lLine, COMMENT_SIGN );
+    RuleBox::Ptr lCurrentRuleBox;
+    while ( std::getline( aStr, lLine, COMMENT_SIGN ) )
+    {
+        if ( lLine.size() )
+        {
+            if( boost::regex_match( lLine, RULE_BOX_REG ) )
+            {
+                lCurrentRuleBox = m_CreateRuleBox();
+            }
+
+        }
+    }
+    if ( !m_Rules.size() )
+    {
+        throw std::runtime_error( "Could not create any rules from configuration.");
+    }
 }
 
 } // namespace Color

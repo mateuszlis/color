@@ -11,6 +11,7 @@ class Config
 {
     public: // constants
         static const char COMMENT_SIGN = '#';
+        static const boost::regex RULE_BOX_REG;
 
     public: // typedefs
         typedef std::shared_ptr< Config > Ptr;
