@@ -15,6 +15,8 @@ class Config
         static const boost::regex NUMBER_RULE_REG;
         static const uint8_t OMIT_FIRST_BRACKET = 1;
         static const uint8_t NUMBER_OF_BRACKETS_RULEBOX = 2;
+        static const uint8_t NUMBER_OF_WORDS = 2;
+        static const uint8_t MIN_SIZE_NUM_RULE = 2;
 
     public: // typedefs
         typedef std::shared_ptr< Config > Ptr;
@@ -25,6 +27,8 @@ class Config
         typedef std::function< NumberRule::Ptr( ColorName
                 , const uint8_t ) > NumberRuleCreator;
         typedef std::function< RuleBox::Ptr( void ) > RuleBoxCreator;
+        typedef std::vector< std::string > Words;
+        typedef std::vector< ColorName > Colors;
 
     public: // functions
         Config( std::istream& aFile );
@@ -38,6 +42,7 @@ class Config
 
     protected: // functions
         void parseConfig( std::istream& aStr );
+        ColorName matchColor( const std::string& aColorStr );
 
     protected: // fields
         RuleMap m_Rules;
