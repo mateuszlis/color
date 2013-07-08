@@ -49,6 +49,8 @@ class Config
         void handleRule( RuleBox::Ptr& aCurrentRule
                 , const std::string& aLine
                 , const bool aWholeL );
+        void handleError( const std::string& aLine
+                , const size_t aLineNumber ); 
 
     protected: // fields
         RuleMap m_Rules;

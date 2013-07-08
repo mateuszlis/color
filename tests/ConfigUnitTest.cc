@@ -175,8 +175,6 @@ TEST_F( ConfigTest, SingleBoxWithSingleRule_WholeLine )
         << "RuleBox " << RULE_NAME << " not found";
 }
 
-// helper for next few tests
-
 
 TEST_F( ConfigTest, MultipleBoxesMultipleRules )
 {
@@ -195,11 +193,6 @@ TEST_F( ConfigTest, MultipleBoxesMultipleRules )
     Config::Ptr lConfig( createConfig( lStr ) );
     ASSERT_EQ( lConfig->getAllRules().size(), TWO )
         << " Number of rules in file should be 1";
-    RuleBox::Ptr lRuleBox;
-    //ASSERT_NO_THROW( lRuleBox = lConfig->getRuleBox( RULE_NAME ) )
-    //    << "RuleBox " << RULE_NAME << " not found";
-    //ASSERT_NO_THROW( lRuleBox = lConfig->getRuleBox( SECOND_RULE ) )
-    //    << "RuleBox " << RULE_NAME << " not found";
 }
 
 TEST_F( ConfigTest, ConfigWithComments )
@@ -224,15 +217,9 @@ TEST_F( ConfigTest, ConfigWithComments )
     Config::Ptr lConfig( createConfig( lStr ) );
     ASSERT_EQ( lConfig->getAllRules().size(), TWO )
         << " Number of rules in file should be 1";
-    RuleBox::Ptr lRuleBox;
-    //ASSERT_NO_THROW( lRuleBox = lConfig->getRuleBox( RULE_NAME ) )
-    //    << "RuleBox " << RULE_NAME << " not found";
-    //ASSERT_NO_THROW( lRuleBox = lConfig->getRuleBox( SECOND_RULE ) )
-    //    << "RuleBox " << RULE_NAME << " not found";
-
 }
 
-TEST_F( ConfigTest, WrongBoxName )
+TEST_F( ConfigTest, WrongBoxName_NonValgrind )
 {
     InSequence lSeq;
     const std::string RULE_NAME( " BoxName" ), SECOND_RULE( "Name" );
@@ -252,7 +239,7 @@ TEST_F( ConfigTest, WrongBoxName )
     ASSERT_THROW( lConfig = Config::Ptr( new Config( lStr ) ), std::runtime_error );
 }
 
-TEST_F( ConfigTest, WrongBoxName2 )
+TEST_F( ConfigTest, WrongBoxName2_NonValgrind )
 {
     InSequence lSeq;
     const std::string RULE_NAME( "*BoxName" ), SECOND_RULE( "Name" );
@@ -272,7 +259,7 @@ TEST_F( ConfigTest, WrongBoxName2 )
     ASSERT_THROW( lConfig = Config::Ptr( new Config( lStr ) ), std::runtime_error );
 }
 
-TEST_F( ConfigTest, SpacesInContent )
+TEST_F( ConfigTest, SpacesInContent_NonValgrind )
 {
     InSequence lSeq;
     const std::string RULE_NAME( "BoxName" ), SECOND_RULE( "Name" );
@@ -292,7 +279,7 @@ TEST_F( ConfigTest, SpacesInContent )
     ASSERT_THROW( lConfig = Config::Ptr( new Config( lStr ) ), std::runtime_error );
 }
 
-TEST_F( ConfigTest, SpacesInContent2 )
+TEST_F( ConfigTest, SpacesInContent2_NonValgrind )
 {
     InSequence lSeq;
     const std::string RULE_NAME( "BoxName" ), SECOND_RULE( "Name" );
@@ -312,7 +299,7 @@ TEST_F( ConfigTest, SpacesInContent2 )
     ASSERT_THROW( lConfig = Config::Ptr( new Config( lStr ) ), std::runtime_error );
 }
 
-TEST_F( ConfigTest, WrongPrefixName )
+TEST_F( ConfigTest, WrongPrefixName_NonValgrind )
 {
     InSequence lSeq;
     const std::string RULE_NAME( "BoxName" ), SECOND_RULE( "Name" );

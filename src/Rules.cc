@@ -2,16 +2,6 @@
 
 namespace Color {
 
-std::string colorizeString( const boost::smatch aMatch, ColorName aColor, ColorName aResetCol = RESET )
-{
-    std::stringstream lStream;
-    if ( aMatch[0].str().size() )
-    {
-        color( aColor, aMatch[0].str(), lStream, aResetCol );
-    }
-    return lStream.str();
-}
-
 IntermediateResult::IntermediateResult( const size_t aSize ) 
     : m_RulesOnPositions( aSize )
       , m_IsOpened( false )

@@ -67,9 +67,11 @@ const Config::RuleMap& Config::getAllRules() const
 void Config::parseConfig( std::istream& aStr )
 {
     std::string lLine;
-    RuleBox::Ptr lCurrentRuleBox;
+    RuleBox::Ptr lCurrentRuleBox( NULL );
+    size_t lLineNumber( 0 );
     while ( std::getline( aStr, lLine ) )
     {
+        ++lLineNumber;
         if ( lLine.size() && lLine[ 0 ] != COMMENT_SIGN )
         {
             if( boost::regex_match( lLine, RULE_BOX_REG ) )
@@ -81,7 +83,8 @@ void Config::parseConfig( std::istream& aStr )
                                         , lLine.size() - NUMBER_OF_BRACKETS_RULEBOX )
                             , lCurrentRuleBox ) );
             }
-            else if ( boost::regex_match( lLine, NUMBER_RULE_REG ) )
+            else if ( boost::regex_match( lLine, NUMBER_RULE_REG ) 
+                    && lCurrentRuleBox )
             {
                 std::cout << "Number" << std::endl;
                 Words lValues; // unlucky name
@@ -112,17 +115,23 @@ void Config::parseConfig( std::istream& aStr )
                                     , std::placeholders::_1 ) );
                 lCurrentRuleBox->addRule( lRule );
             }
-            else if ( boost::regex_match( lLine, RULE_REG ) )
+            else if ( boost::regex_match( lLine, RULE_REG ) 
+                    && lCurrentRuleBox )
             {
                 std::cout << "Rule" << std::endl;
                 static const bool doNotColoWholeLines( false );
                 handleRule( lCurrentRuleBox, lLine, doNotColoWholeLines );
             }
-            else if ( boost::regex_match( lLine, RULE_WHOLE_REG ) )
+            else if ( boost::regex_match( lLine, RULE_WHOLE_REG ) 
+                    && lCurrentRuleBox )
             {
                 std::cout << "Whole rule " << lLine << std::endl;
                 static const bool colorWholeLines( true );
                 handleRule( lCurrentRuleBox, lLine, colorWholeLines );
+            }
+            else
+            {
+                handleError( lLine, lLineNumber );
             }
 
         }
@@ -184,6 +193,16 @@ void Config::handleRule( RuleBox::Ptr& aCurrentRuleBox
                 , lValues[ 1 ]
                 , aWholeL ) );
     aCurrentRuleBox->addRule( lRule );
+}
+
+void Config::handleError( const std::string& aLine
+        , const size_t aLineNumber )
+{
+    std::stringstream lStr;
+    lStr << "Did not recognize line " << aLine 
+        << " of configuration file " << std::endl 
+        << "\"" << aLine << "\"" << std::endl;
+    throw std::runtime_error( lStr.str() );
 }
 
 } // namespace Color
