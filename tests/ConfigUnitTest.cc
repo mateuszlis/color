@@ -1,5 +1,6 @@
 // std
 #include <iostream>
+#include <memory>
 #include <limits>
 #include <stdexcept>
 
@@ -26,27 +27,32 @@ using ::testing::Return;
 class ConfigTest : public ::testing::Test
 {
     protected: // fields
-        MockRuleProducer m_RuleProducer;
+        FakeRuleProducer::Ptr m_RuleProducer;
         Config::RuleCreator m_RuleCreator;
         Config::NumberRuleCreator m_NumberRuleCreator;
         Config::RuleBoxCreator m_RuleBoxCreator;
+        RuleBox::Ptr m_DefaultBox;
     protected: // functions
         virtual void SetUp()
         {
+            m_RuleProducer = FakeRuleProducer::Ptr( new FakeRuleProducer );
+            m_DefaultBox.reset( new RuleBox );
             m_RuleCreator = std::bind(
-                    &MockRuleProducer::produceRule
-                    , &m_RuleProducer
+                    &FakeRuleProducer::produceRule
+                    , m_RuleProducer.get()
                     , std::placeholders::_1
                     , std::placeholders::_2
                     , std::placeholders::_3 );
             m_NumberRuleCreator = std::bind(
-                    &MockRuleProducer::produceNumberRule
-                    , &m_RuleProducer
+                    &FakeRuleProducer::produceNumberRule
+                    , m_RuleProducer.get()
                     , std::placeholders::_1
                     , std::placeholders::_2 );
             m_RuleBoxCreator = std::bind(
-                    &MockRuleProducer::produceRuleBox
-                    , &m_RuleProducer );
+                    &FakeRuleProducer::produceRuleBox
+                    , m_RuleProducer.get() );
+            //ON_CALL( m_RuleProducer, produceRuleBox() )
+            //          .WillByDefault( Return( m_DefaultBox ) );
         }
 
         Config* createConfig( std::istream& aStr )
@@ -56,31 +62,26 @@ class ConfigTest : public ::testing::Test
 
     void setExpectations()
     {
-        EXPECT_CALL( m_RuleProducer, produceRule( RED, REGEX, true ) )
-            .Times( 1 )
-            .WillOnce( Return( Rule::Ptr( new Rule( RED, REGEX, true ) ) ) );
-        EXPECT_CALL( m_RuleProducer, produceRule( BROWN, REGEX, false ) )
-            .Times( 1 )
-            .WillOnce( Return( Rule::Ptr( new Rule( BROWN, REGEX, false ) ) ) );
-        EXPECT_CALL( m_RuleProducer, produceNumberRule( BLUE, 3 ) )
-            .Times( 1 )
-            .WillOnce( Return( NumberRule::Ptr( new NumberRule( BLUE, 3 ) ) ) );
-
         MockRuleBox::Ptr lFirstRuleBox( new MockRuleBox )
             , lSecondRuleBox( new MockRuleBox );
-        EXPECT_CALL( m_RuleProducer, produceRuleBox() )
-            .Times( 2 )
-            .WillOnce( Return( lFirstRuleBox ) ) // std::ref?
-            .WillOnce( Return( lSecondRuleBox ) );
+        m_RuleProducer->addRuleBox( lFirstRuleBox );
+        m_RuleProducer->addRuleBox( lSecondRuleBox );
+
+        EXPECT_CALL( *m_RuleProducer, produceRuleBoxMock() ).Times( 2 );
+        EXPECT_CALL( *m_RuleProducer, produceRuleMock( RED, REGEX, true ) )
+            .Times( 1 );
+        EXPECT_CALL( *m_RuleProducer, produceRuleMock( BROWN, REGEX, false ) )
+            .Times( 1 );
         EXPECT_CALL( *lFirstRuleBox, addRule( _ ) ).Times( 2 );
-        EXPECT_CALL( *lFirstRuleBox, addRule( _ ) ).Times( 1 );
+        EXPECT_CALL( *m_RuleProducer, produceNumberRuleMock( BLUE, 3 ) )
+            .Times( 1 );
+        EXPECT_CALL( *lSecondRuleBox, addRule( _ ) ).Times( 1 );
     }
 
     void proceedWithSingleColorRuleConf( ColorName aCol, std::istream& aStr, const std::string& aRuleName )
     {
-        EXPECT_CALL( m_RuleProducer, produceRule( aCol, REGEX, false ) )
-            .Times( 1 )
-            .WillOnce( Return( Rule::Ptr( new Rule( aCol, REGEX, false ) ) ) );
+        EXPECT_CALL( *m_RuleProducer, produceRuleMock( aCol, REGEX, false ) )
+            .Times( 1 );
 
         Config::Ptr lConfig( createConfig( aStr ) );
 
@@ -102,9 +103,10 @@ TEST_F( ConfigTest, Construct )
 #define SingleColorTest(col) \
 TEST_F( ConfigTest, SingleBoxWithSingleRegexRule##col ) \
 { \
+    InSequence lSeq; \
     const std::string RULE_NAME( "BoxName" ); \
     std::istringstream lStr(  "[" + RULE_NAME + "]\n" \
-        "color=[##col]:" + REGEX + "\n" \
+        "color=[" + #col + "]:" + REGEX + "\n" \
         ); \
     \
     proceedWithSingleColorRuleConf(col, lStr, RULE_NAME );\
@@ -125,22 +127,30 @@ SingleColorTest(RESET);
 
 TEST_F( ConfigTest, SingleBoxWithSingleNumberRule )
 {
+    InSequence lSeq;
     const std::string RULE_NAME( "BoxName" );
     std::istringstream lStr( "[" + RULE_NAME + "]\n"
             "alternate=3:[BLUE],[BROWN]\n" );
 
     MockNumberRule::Ptr lMockRule( new MockNumberRule );
-    EXPECT_CALL( m_RuleProducer, produceNumberRule( BLUE, 3 ) )
-        .Times( 1 )
-        .WillOnce( Return( lMockRule ) );
+    m_RuleProducer->addNumberRule( lMockRule );
+
+    EXPECT_CALL( *m_RuleProducer, produceRuleBoxMock() )
+        .Times( 1 );
+        //.WillOnce( Return( RuleBox::Ptr( new RuleBox) ) );
+    EXPECT_CALL( *m_RuleProducer, produceNumberRuleMock( BLUE, THREE ) )
+        .Times( 1 );
+        //.WillOnce( Return( lMockRule ) );
     EXPECT_CALL( *lMockRule, addColor( BROWN ) ).Times( 1 );
 
     Config::Ptr lConfig( createConfig( lStr ) );
     ASSERT_EQ( lConfig->getAllRules().size(), ONE )
         << " Number of rules in file should be 1";
     RuleBox::Ptr lRuleBox;
-    ASSERT_NO_THROW( lRuleBox = lConfig->getRuleBox( RULE_NAME ) )
-        << "RuleBox " << RULE_NAME << " not found";
+    lRuleBox = lConfig->getRuleBox( RULE_NAME );
+    lMockRule.reset();
+    //ASSERT_NO_THROW( lRuleBox = lConfig->getRuleBox( RULE_NAME ) )
+    //    << "RuleBox " << RULE_NAME << " not found";
 }
 
 TEST_F( ConfigTest, SingleBoxWithSingleRule_WholeLine )
@@ -150,9 +160,12 @@ TEST_F( ConfigTest, SingleBoxWithSingleRule_WholeLine )
         "color_full_line=[RED]:" + REGEX + "\n"
         );
 
-    EXPECT_CALL( m_RuleProducer, produceRule( RED, REGEX, true ) )
-        .Times( 1 )
-        .WillOnce( Return( Rule::Ptr( new Rule( RED, REGEX, true ) ) ) );
+    EXPECT_CALL( *m_RuleProducer, produceRuleBoxMock() )
+        .Times( 1 );
+        //.WillOnce( Return( RuleBox::Ptr( new RuleBox) ) );
+    EXPECT_CALL( *m_RuleProducer, produceRuleMock( RED, REGEX, true ) )
+        .Times( 1 );
+        //.WillOnce( Return( Rule::Ptr( new Rule( RED, REGEX, true ) ) ) );
 
     Config::Ptr lConfig( createConfig( lStr ) );
     ASSERT_EQ( lConfig->getAllRules().size(), ONE )
@@ -183,14 +196,15 @@ TEST_F( ConfigTest, MultipleBoxesMultipleRules )
     ASSERT_EQ( lConfig->getAllRules().size(), TWO )
         << " Number of rules in file should be 1";
     RuleBox::Ptr lRuleBox;
-    ASSERT_NO_THROW( lRuleBox = lConfig->getRuleBox( RULE_NAME ) )
-        << "RuleBox " << RULE_NAME << " not found";
-    ASSERT_NO_THROW( lRuleBox = lConfig->getRuleBox( SECOND_RULE ) )
-        << "RuleBox " << RULE_NAME << " not found";
+    //ASSERT_NO_THROW( lRuleBox = lConfig->getRuleBox( RULE_NAME ) )
+    //    << "RuleBox " << RULE_NAME << " not found";
+    //ASSERT_NO_THROW( lRuleBox = lConfig->getRuleBox( SECOND_RULE ) )
+    //    << "RuleBox " << RULE_NAME << " not found";
 }
 
 TEST_F( ConfigTest, ConfigWithComments )
 {
+    InSequence lSeq;
     const std::string RULE_NAME( "BoxName" ), SECOND_RULE( "Name" );
     std::istringstream lStr(
         "# sdkjasldjasvl\n"
@@ -221,6 +235,7 @@ TEST_F( ConfigTest, ConfigWithComments )
 
 TEST_F( ConfigTest, WrongBoxName )
 {
+    InSequence lSeq;
     const std::string RULE_NAME( " BoxName" ), SECOND_RULE( "Name" );
     std::istringstream lStr(
         "[" + RULE_NAME + "]\n"
@@ -240,6 +255,7 @@ TEST_F( ConfigTest, WrongBoxName )
 
 TEST_F( ConfigTest, WrongBoxName2 )
 {
+    InSequence lSeq;
     const std::string RULE_NAME( "*BoxName" ), SECOND_RULE( "Name" );
     std::istringstream lStr(
         "[" + RULE_NAME + "]\n"
@@ -259,6 +275,7 @@ TEST_F( ConfigTest, WrongBoxName2 )
 
 TEST_F( ConfigTest, SpacesInContent )
 {
+    InSequence lSeq;
     const std::string RULE_NAME( "BoxName" ), SECOND_RULE( "Name" );
     std::istringstream lStr(
         "[" + RULE_NAME + "]\n"
@@ -278,6 +295,7 @@ TEST_F( ConfigTest, SpacesInContent )
 
 TEST_F( ConfigTest, SpacesInContent2 )
 {
+    InSequence lSeq;
     const std::string RULE_NAME( "BoxName" ), SECOND_RULE( "Name" );
     std::istringstream lStr(
         "[" + RULE_NAME + "]\n"
@@ -297,6 +315,7 @@ TEST_F( ConfigTest, SpacesInContent2 )
 
 TEST_F( ConfigTest, WrongPrefixName )
 {
+    InSequence lSeq;
     const std::string RULE_NAME( "BoxName" ), SECOND_RULE( "Name" );
     std::istringstream lStr(
         "[" + RULE_NAME + "]\n"
