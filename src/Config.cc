@@ -73,56 +73,22 @@ void Config::parseConfig( std::istream& aStr )
     while ( std::getline( aStr, lLine ) )
     {
         ++lLineNumber;
-        if ( lLine.size() && lLine[ 0 ] != COMMENT_SIGN )
+        if ( isRelevant( lLine ) )
         {
-            if( boost::regex_match( lLine, RULE_BOX_REG ) )
+            if( couldBeRuleBox( lLine ) )
             {
-                lCurrentRuleBox = m_CreateRuleBox();
-                m_Rules.insert(
-                        RuleMapElem( lLine.substr(
-                                        OMIT_FIRST_BRACKET
-                                        , lLine.size() - NUMBER_OF_BRACKETS_RULEBOX )
-                            , lCurrentRuleBox ) );
+                handleRuleBox( lCurrentRuleBox, lLine );
             }
-            else if ( boost::regex_match( lLine, NUMBER_RULE_REG ) 
-                    && lCurrentRuleBox )
+            else if ( couldBeNumberRule( lLine, lCurrentRuleBox ) )
             {
-                Words lValues; // unlucky name
-                preprocessLine( lLine, lValues );
-                uint8_t lColorLineNumber(
-                        boost::lexical_cast< int >( lValues[ 0 ] ) );
-                Words lColorNames;
-                boost::split( lColorNames, lValues[ 1 ], boost::is_any_of( "," ) );
-                if ( lColorNames.size() < MIN_SIZE_NUM_RULE )
-                {
-                    throw std::runtime_error( "Not enough parameters in line " + lLine );
-                }
-                Colors lColors( lColorNames.size() );
-
-                std::transform( begin( lColorNames ), end( lColorNames )
-                        , begin( lColors )
-                        , std::bind( &Config::matchColor
-                                , this
-                                , std::placeholders::_1 ) );
-
-                NumberRule::Ptr lRule( m_CreateNumberRule( *begin( lColors )
-                            , lColorLineNumber ) );
-
-                std::for_each( ++begin( lColors ) // start from second element
-                            , end( lColors )
-                            , std::bind( &NumberRule::addColor
-                                    , std::ref( *lRule )
-                                    , std::placeholders::_1 ) );
-                lCurrentRuleBox->addRule( lRule );
+                handleNumberRule( lCurrentRuleBox, lLine );
             }
-            else if ( boost::regex_match( lLine, RULE_REG ) 
-                    && lCurrentRuleBox )
+            else if ( couldBeRule( lLine, lCurrentRuleBox ) )
             {
                 static const bool doNotColoWholeLines( false );
                 handleRule( lCurrentRuleBox, lLine, doNotColoWholeLines );
             }
-            else if ( boost::regex_match( lLine, RULE_WHOLE_REG ) 
-                    && lCurrentRuleBox )
+            else if ( couldBeWholeLineRule( lLine, lCurrentRuleBox ) )
             {
                 static const bool colorWholeLines( true );
                 handleRule( lCurrentRuleBox, lLine, colorWholeLines );
@@ -188,6 +154,46 @@ void Config::preprocessLine( const std::string& aLine, Words& aValues )
     aValues.push_back( lValuePart.substr( lSplitter + 1, lValuePart.size() - lSplitter ) );
 }
 
+void Config::handleRuleBox( RuleBox::Ptr& aCurrentRuleBox
+        , const std::string& aLine )
+{
+    aCurrentRuleBox = m_CreateRuleBox();
+    m_Rules.insert( RuleMapElem( aLine.substr(
+                            OMIT_FIRST_BRACKET
+                            , aLine.size() - NUMBER_OF_BRACKETS_RULEBOX )
+                , aCurrentRuleBox ) );
+
+}
+void Config::handleNumberRule( RuleBox::Ptr& aCurrentRuleBox
+        , const std::string& aLine )
+{
+    Words lValues; // unlucky name
+    preprocessLine( aLine, lValues );
+    uint8_t lColorLineNumber(
+                boost::lexical_cast< int >( lValues[ 0 ] ) );
+    Words lColorNames;
+    boost::split( lColorNames, lValues[ 1 ], boost::is_any_of( "," ) );
+    if ( lColorNames.size() < MIN_SIZE_NUM_RULE )
+        throw std::runtime_error( "Not enough parameters in line " + aLine );
+
+    Colors lColors( lColorNames.size() );
+
+    std::transform( begin( lColorNames ), end( lColorNames )
+            , begin( lColors )
+            , std::bind( &Config::matchColor
+                    , this
+                    , std::placeholders::_1 ) );
+
+    NumberRule::Ptr lRule( m_CreateNumberRule( *begin( lColors )
+                , lColorLineNumber ) );
+
+    std::for_each( ++begin( lColors ) // start from second element
+                , end( lColors )
+                , std::bind( &NumberRule::addColor
+                        , std::ref( *lRule )
+                        , std::placeholders::_1 ) );
+    aCurrentRuleBox->addRule( lRule );
+}
 void Config::handleRule( RuleBox::Ptr& aCurrentRuleBox
         , const std::string& aLine
         , const bool aWholeL )
@@ -204,8 +210,8 @@ void Config::handleError( const std::string& aLine
         , const size_t aLineNumber )
 {
     std::stringstream lStr;
-    lStr << "Did not recognize line " << aLine 
-        << " of configuration file " << std::endl 
+    lStr << "Did not recognize line " << aLineNumber
+        << " of configuration file " << std::endl
         << "\"" << aLine << "\"" << std::endl;
     throw std::runtime_error( lStr.str() );
 }

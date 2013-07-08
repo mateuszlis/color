@@ -46,17 +46,41 @@ class Config
         void parseConfig( std::istream& aStr );
         ColorName matchColor( const std::string& aColorStr );
         void preprocessLine( const std::string& aLine, Words& aValues );
+        void handleRuleBox( RuleBox::Ptr& aCurrentRule
+                , const std::string& aLine );
+        void handleNumberRule( RuleBox::Ptr& aCurrentRuleBox
+                , const std::string& aLine );
         void handleRule( RuleBox::Ptr& aCurrentRule
                 , const std::string& aLine
                 , const bool aWholeL );
         void handleError( const std::string& aLine
-                , const size_t aLineNumber ); 
+                , const size_t aLineNumber );
 
+        // condition simplifiers
+        bool isRelevant( const std::string& aLine )
+        { return aLine.size() && aLine[ 0 ] != COMMENT_SIGN; }
+
+        bool couldBeRuleBox( const std::string& aLine )
+        { return boost::regex_match( aLine, RULE_BOX_REG ); }
+        bool couldBeNumberRule( const std::string& aLine
+                , const RuleBox::Ptr& aCurrentRuleBox )
+        { return ( boost::regex_match( aLine, NUMBER_RULE_REG )
+                && aCurrentRuleBox ); }
+        bool couldBeRule( const std::string& aLine
+                , const RuleBox::Ptr& aCurrentRuleBox )
+        { return ( boost::regex_match( aLine, RULE_REG )
+                && aCurrentRuleBox ); }
+        bool couldBeWholeLineRule( const std::string& aLine
+                , const RuleBox::Ptr& aCurrentRuleBox )
+        { return ( boost::regex_match( aLine, RULE_WHOLE_REG )
+                && aCurrentRuleBox ); }
     protected: // fields
         RuleMap m_Rules;
         RuleCreator m_CreateRule;
         NumberRuleCreator m_CreateNumberRule;
         RuleBoxCreator m_CreateRuleBox;
+
+
 
 }; // class Config
 
