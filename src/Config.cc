@@ -7,7 +7,10 @@
 namespace Color {
 
 const boost::regex Config::RULE_BOX_REG = boost::regex( "\\[[a-zA-Z0-9]*\\]" );
-const boost::regex Config::NUMBER_RULE_REG = boost::regex( "alternate=[0-9]*:(\\[(RED|GREEN|BLUE|BROWN)\\],)*\\[(RED|GREEN|BLUE|BROWN)\\]" );
+const std::string COLOR_NAME ="(\\[(RED|GREEN|BLUE|BROWN)\\],)*\\[(RED|GREEN|BLUE|BROWN)\\]";
+const boost::regex Config::NUMBER_RULE_REG = boost::regex( "alternate=[0-9]*:" + COLOR_NAME );
+const boost::regex Config::RULE_REG = boost::regex( "color=" + COLOR_NAME + ":.*" );
+const boost::regex Config::RULE_WHOLE_REG = boost::regex( "color_full_line=" + COLOR_NAME + ":.*" );
 // helper wrappers for constructors of rules
 Rule::Ptr ruleWrapper( ColorName aColor, const std::string& aRegex
         , bool aWholeLine )
@@ -70,13 +73,13 @@ void Config::parseConfig( std::istream& aStr )
     while ( std::getline( aStr, lLine ) )
     {
         std::cout << "HERE" << lLine << "!" << std::endl;
-        if ( lLine.size() )
+        if ( lLine.size() && lLine[ 0 ] != COMMENT_SIGN )
         {
             if( boost::regex_match( lLine, RULE_BOX_REG ) )
             {
                 std::cout << "HERE2" << std::endl;
                 lCurrentRuleBox = m_CreateRuleBox();
-                m_Rules.insert( 
+                m_Rules.insert(
                         RuleMapElem( lLine.substr(
                                         OMIT_FIRST_BRACKET
                                         , lLine.size() - NUMBER_OF_BRACKETS_RULEBOX )
@@ -85,20 +88,10 @@ void Config::parseConfig( std::istream& aStr )
             else if ( boost::regex_match( lLine, NUMBER_RULE_REG ) )
             {
                 std::cout << "Number" << std::endl;
-                Words lNameAndColors;
-                boost::split( lNameAndColors, lLine, boost::is_any_of( "=" ) );
-                if ( lNameAndColors.size() != NUMBER_OF_WORDS )
-                {
-                    throw std::runtime_error( "Too many ':' sings in line " + lLine );
-                }
-                Words lValues;
-                boost::split( lValues, lNameAndColors[ 1 ], boost::is_any_of( ":" ) );
-                if ( lValues.size() < MIN_SIZE_NUM_RULE )
-                {
-                    throw std::runtime_error( "Not enough parameters in line " + lLine );
-                }
+                Words lValues; // unlucky name
+                preprocessLine( lLine, lValues );
                 std::cout << lValues[0] << "!" << std::endl;
-                uint8_t lColorLineNumber(  
+                uint8_t lColorLineNumber(
                         boost::lexical_cast< int >( lValues[ 0 ] ) );
                 Words lColorNames;
                 boost::split( lColorNames, lValues[ 1 ], boost::is_any_of( "," ) );
@@ -106,27 +99,35 @@ void Config::parseConfig( std::istream& aStr )
                 {
                     throw std::runtime_error( "Not enough parameters in line " + lLine );
                 }
-                Colors lColors;
+                Colors lColors( lColorNames.size() );
 
-                std::cout << lColorNames[0] << "!" << std::endl;
-                for ( Words::iterator namesIt( begin( lColorNames ) ) ; namesIt != end( lColorNames ) ; ++namesIt )
-                {
-                    lColors.push_back( matchColor( *namesIt ) );
-                }
-                //std::transform( begin( lColorNames ), end( lColorNames )
-                //        , begin( lColors )
-                //        , std::bind( &Config::matchColor, this, std::placeholders::_1 ) ); 
+                std::transform( begin( lColorNames ), end( lColorNames )
+                        , begin( lColors )
+                        , std::bind( &Config::matchColor
+                                , this
+                                , std::placeholders::_1 ) );
 
                 NumberRule::Ptr lRule( m_CreateNumberRule( *begin( lColors )
                             , lColorLineNumber ) );
-                std::cout << "!!" << lRule.use_count() << std::endl;
 
-                std::for_each( ++begin( lColors )
+                std::for_each( ++begin( lColors ) // start from second element
                             , end( lColors )
                             , std::bind( &NumberRule::addColor
-                                    , *lRule
+                                    , std::ref( *lRule )
                                     , std::placeholders::_1 ) );
-
+                lCurrentRuleBox->addRule( lRule );
+            }
+            else if ( boost::regex_match( lLine, RULE_REG ) )
+            {
+                std::cout << "Rule" << std::endl;
+                static const bool doNotColoWholeLines( false );
+                handleRule( lCurrentRuleBox, lLine, doNotColoWholeLines );
+            }
+            else if ( boost::regex_match( lLine, RULE_WHOLE_REG ) )
+            {
+                std::cout << "Whole rule " << std::endl;
+                static const bool colorWholeLines( true );
+                handleRule( lCurrentRuleBox, lLine, colorWholeLines );
             }
 
         }
@@ -137,7 +138,7 @@ void Config::parseConfig( std::istream& aStr )
     }
 }
 
-ColorName Config::matchColor( const std::string& aColorStr ) 
+ColorName Config::matchColor( const std::string& aColorStr )
 {
     std::cout << "In match color " << aColorStr << std::endl;
     if ( aColorStr == "[RED]" )
@@ -163,6 +164,30 @@ ColorName Config::matchColor( const std::string& aColorStr )
     if ( aColorStr == "[RESET]" )
         return RESET;
     return RESET;
+}
+
+void Config::preprocessLine( const std::string& aLine, Words& aValues )
+{
+    size_t lEqualizerLocation( aLine.find_first_of( "=" ) );
+    std::string lValuePart( aLine.substr( lEqualizerLocation + 1
+                , aLine.size() - lEqualizerLocation ) );
+    size_t lSplitter( lValuePart.find_first_of( ":" ) );
+    aValues.push_back( lValuePart.substr( 0, lSplitter ) );
+    aValues.push_back( lValuePart.substr( lSplitter + 1, lValuePart.size() - lSplitter ) );
+}
+
+void Config::handleRule( RuleBox::Ptr& aCurrentRuleBox
+        , const std::string& aLine
+        , const bool aWholeL )
+{
+    Words lValues; // unlucky name
+    preprocessLine( aLine, lValues );
+    Rule::Ptr lRule( m_CreateRule( matchColor( lValues[ 0 ] )
+                , lValues[ 1 ]
+                , aWholeL ) );
+    std::cout << "After" << std::endl;
+    aCurrentRuleBox->addRule( lRule );
+    std::cout << "AfterAfter" << std::endl;
 }
 
 } // namespace Color
