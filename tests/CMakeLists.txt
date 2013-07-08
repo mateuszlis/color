@@ -10,7 +10,10 @@ add_executable (ConfigTest ConfigUnitTest.cc )
 #debugging
 add_test(RulesTest ${EXECUTABLE_OUTPUT_PATH}/RulesTest)
 add_test(RulesTest|Valgrind valgrind --leak-check=full
-    --undef-value-errors=no -v --error-exitcode=1 ${EXECUTABLE_OUTPUT_PATH}/RulesTest --gtest_filter=-*zero_color_error*) 
+    --undef-value-errors=no -v --error-exitcode=1 ${EXECUTABLE_OUTPUT_PATH}/RulesTest --gtest_filter=-*NonVal*) 
+add_test(ConfigTest ${EXECUTABLE_OUTPUT_PATH}/ConfigTest)
+add_test(ConfigTest|Valgrind valgrind --leak-check=full
+    --undef-value-errors=no -v --error-exitcode=1 ${EXECUTABLE_OUTPUT_PATH}/RulesTest --gtest_filter=-*NonVal*) 
 #cppcheck
 add_test(cppcheckInfo  cppcheck ${BASE_SRC_DIR} --error-exitcode=1 --enable=information -q )
 add_test(cppcheckUnusedFunctions  cppcheck ${BASE_SRC_DIR} --error-exitcode=1 --enable=unusedFunction -q )

@@ -113,7 +113,7 @@ TEST( NumberRuleTest, one_color )
 
 }
 
-TEST( NumberRuleTest, zero_color_error )
+TEST( NumberRuleTest, zero_color_errorNonValgrind )
 {
     InSequence dummy;
     const uint8_t lLinesCount( 0 );

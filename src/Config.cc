@@ -133,7 +133,7 @@ void Config::parseConfig( std::istream& aStr )
             }
         }
     }
-    if ( !m_Rules.size() )
+    if ( m_Rules.empty() )
     {
         throw std::runtime_error( "Could not create any rules from configuration.");
     }
