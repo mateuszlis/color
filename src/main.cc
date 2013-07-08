@@ -38,7 +38,7 @@ int main( int argc, char* argv[] )
     fd_set selectset;
     struct timeval timeout = {1,0}; //timeout of 10 secs.
     int ret;
-    FD_ZERO(&selectset);sdajsdlasjclk:w
+    FD_ZERO(&selectset);
 
     FD_SET(0,&selectset);
     ret =  select(1,&selectset,NULL,NULL,&timeout);
