@@ -52,12 +52,10 @@ Config::Config( std::istream& aFile
 const RuleBox::Ptr Config::getRuleBox( const std::string& aName ) const
 {
     RuleMap::const_iterator lRulesIt( m_Rules.find( aName ) );
-    std::cout << "AAA" << std::endl;
     if ( lRulesIt == m_Rules.end() )
     {
         throw std::runtime_error( "Expected rule cannot be found in config file " + aName );
     }
-    std::cout << "AAA" << std::endl;
     return lRulesIt->second;
 }
 
@@ -72,12 +70,10 @@ void Config::parseConfig( std::istream& aStr )
     RuleBox::Ptr lCurrentRuleBox;
     while ( std::getline( aStr, lLine ) )
     {
-        std::cout << "HERE" << lLine << "!" << std::endl;
         if ( lLine.size() && lLine[ 0 ] != COMMENT_SIGN )
         {
             if( boost::regex_match( lLine, RULE_BOX_REG ) )
             {
-                std::cout << "HERE2" << std::endl;
                 lCurrentRuleBox = m_CreateRuleBox();
                 m_Rules.insert(
                         RuleMapElem( lLine.substr(
@@ -90,7 +86,6 @@ void Config::parseConfig( std::istream& aStr )
                 std::cout << "Number" << std::endl;
                 Words lValues; // unlucky name
                 preprocessLine( lLine, lValues );
-                std::cout << lValues[0] << "!" << std::endl;
                 uint8_t lColorLineNumber(
                         boost::lexical_cast< int >( lValues[ 0 ] ) );
                 Words lColorNames;
@@ -125,11 +120,15 @@ void Config::parseConfig( std::istream& aStr )
             }
             else if ( boost::regex_match( lLine, RULE_WHOLE_REG ) )
             {
-                std::cout << "Whole rule " << std::endl;
+                std::cout << "Whole rule " << lLine << std::endl;
                 static const bool colorWholeLines( true );
                 handleRule( lCurrentRuleBox, lLine, colorWholeLines );
             }
 
+        }
+        else
+        {
+            std::cout << "Omited line " << lLine << std::endl;
         }
     }
     if ( !m_Rules.size() )
@@ -140,7 +139,6 @@ void Config::parseConfig( std::istream& aStr )
 
 ColorName Config::matchColor( const std::string& aColorStr )
 {
-    std::cout << "In match color " << aColorStr << std::endl;
     if ( aColorStr == "[RED]" )
         return RED;
     if ( aColorStr == "[BOLD_RED]" )
@@ -185,9 +183,7 @@ void Config::handleRule( RuleBox::Ptr& aCurrentRuleBox
     Rule::Ptr lRule( m_CreateRule( matchColor( lValues[ 0 ] )
                 , lValues[ 1 ]
                 , aWholeL ) );
-    std::cout << "After" << std::endl;
     aCurrentRuleBox->addRule( lRule );
-    std::cout << "AfterAfter" << std::endl;
 }
 
 } // namespace Color
