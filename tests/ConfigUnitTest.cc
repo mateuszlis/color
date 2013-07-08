@@ -94,7 +94,7 @@ class ConfigTest : public ::testing::Test
 
 }; // class ConfigTest
 
-TEST_F( ConfigTest, Construct )
+TEST_F( ConfigTest, Construct_NonValgrind )
 {
     std::istringstream lStr( "" );
     Config::Ptr lConfig;
@@ -104,6 +104,7 @@ TEST_F( ConfigTest, Construct )
 TEST_F( ConfigTest, SingleBoxWithSingleRegexRule##col ) \
 { \
     InSequence lSeq; \
+    EXPECT_CALL( *m_RuleProducer, produceRuleBoxMock() ); \
     const std::string RULE_NAME( "BoxName" ); \
     std::istringstream lStr(  "[" + RULE_NAME + "]\n" \
         "color=[" + #col + "]:" + REGEX + "\n" \
@@ -113,16 +114,22 @@ TEST_F( ConfigTest, SingleBoxWithSingleRegexRule##col ) \
 }
 
 // let's check if all colors are supported
+SingleColorTest(BLACK);
+SingleColorTest(BOLD_BLACK);
 SingleColorTest(RED);
 SingleColorTest(BOLD_RED);
 SingleColorTest(BROWN);
 SingleColorTest(BOLD_BROWN);
 SingleColorTest(CYAN);
 SingleColorTest(BOLD_CYAN);
-SingleColorTest(LIGHT_GRAY);
-SingleColorTest(BOLD_LIGHT_GRAY);
+SingleColorTest(GRAY);
+SingleColorTest(BOLD_GRAY);
 SingleColorTest(BLUE);
 SingleColorTest(BOLD_BLUE);
+SingleColorTest(GREEN);
+SingleColorTest(BOLD_GREEN);
+SingleColorTest(MAGENTA);
+SingleColorTest(BOLD_MAGENTA);
 SingleColorTest(RESET);
 
 TEST_F( ConfigTest, SingleBoxWithSingleNumberRule )

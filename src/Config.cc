@@ -1,4 +1,5 @@
 #include "Config.hh"
+#include "utils.hh"
 
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
@@ -7,7 +8,7 @@
 namespace Color {
 
 const boost::regex Config::RULE_BOX_REG = boost::regex( "\\[[a-zA-Z0-9]*\\]" );
-const std::string COLOR_NAME ="(\\[(RED|GREEN|BLUE|BROWN)\\],)*\\[(RED|GREEN|BLUE|BROWN)\\]";
+const std::string COLOR_NAME ="(\\[" + COLORS_LIST + "\\],)*\\[" + COLORS_LIST + "\\]";
 const boost::regex Config::NUMBER_RULE_REG = boost::regex( "alternate=[0-9]*:" + COLOR_NAME );
 const boost::regex Config::RULE_REG = boost::regex( "color=" + COLOR_NAME + ":.*" );
 const boost::regex Config::RULE_WHOLE_REG = boost::regex( "color_full_line=" + COLOR_NAME + ":.*" );
@@ -86,7 +87,6 @@ void Config::parseConfig( std::istream& aStr )
             else if ( boost::regex_match( lLine, NUMBER_RULE_REG ) 
                     && lCurrentRuleBox )
             {
-                std::cout << "Number" << std::endl;
                 Words lValues; // unlucky name
                 preprocessLine( lLine, lValues );
                 uint8_t lColorLineNumber(
@@ -118,14 +118,12 @@ void Config::parseConfig( std::istream& aStr )
             else if ( boost::regex_match( lLine, RULE_REG ) 
                     && lCurrentRuleBox )
             {
-                std::cout << "Rule" << std::endl;
                 static const bool doNotColoWholeLines( false );
                 handleRule( lCurrentRuleBox, lLine, doNotColoWholeLines );
             }
             else if ( boost::regex_match( lLine, RULE_WHOLE_REG ) 
                     && lCurrentRuleBox )
             {
-                std::cout << "Whole rule " << lLine << std::endl;
                 static const bool colorWholeLines( true );
                 handleRule( lCurrentRuleBox, lLine, colorWholeLines );
             }
@@ -133,11 +131,6 @@ void Config::parseConfig( std::istream& aStr )
             {
                 handleError( lLine, lLineNumber );
             }
-
-        }
-        else
-        {
-            std::cout << "Omited line " << lLine << std::endl;
         }
     }
     if ( !m_Rules.size() )
@@ -148,26 +141,38 @@ void Config::parseConfig( std::istream& aStr )
 
 ColorName Config::matchColor( const std::string& aColorStr )
 {
+    if ( aColorStr == "[BLACK]" )
+        return BLACK;
+    if ( aColorStr == "[BOLD_BLACK]" )
+        return BOLD_BLACK;
     if ( aColorStr == "[RED]" )
         return RED;
     if ( aColorStr == "[BOLD_RED]" )
         return BOLD_RED;
+    if ( aColorStr == "[GREEN]" )
+        return GREEN;
+    if ( aColorStr == "[BOLD_GREEN]" )
+        return BOLD_GREEN;
     if ( aColorStr == "[BROWN]" )
         return BROWN;
     if ( aColorStr == "[BOLD_BROWN]" )
         return BOLD_BROWN;
-    if ( aColorStr == "[CYAN]" )
-        return CYAN;
-    if ( aColorStr == "[BOLD_CYAN]" )
-        return BOLD_CYAN;
-    if ( aColorStr == "[LIGHT_GRAY]" )
-        return LIGHT_GRAY;
-    if ( aColorStr == "[BOLD_LIGHT_GRAY]" )
-        return BOLD_LIGHT_GRAY;
     if ( aColorStr == "[BLUE]" )
         return BLUE;
     if ( aColorStr == "[BOLD_BLUE]" )
         return BOLD_BLUE;
+    if ( aColorStr == "[MAGENTA]" )
+        return MAGENTA;
+    if ( aColorStr == "[BOLD_MAGENTA]" )
+        return BOLD_MAGENTA;
+    if ( aColorStr == "[CYAN]" )
+        return CYAN;
+    if ( aColorStr == "[BOLD_CYAN]" )
+        return BOLD_CYAN;
+    if ( aColorStr == "[GRAY]" )
+        return GRAY;
+    if ( aColorStr == "[BOLD_GRAY]" )
+        return BOLD_GRAY;
     if ( aColorStr == "[RESET]" )
         return RESET;
     return RESET;

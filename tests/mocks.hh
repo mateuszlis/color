@@ -51,7 +51,6 @@ class FakeRuleProducer
             produceNumberRuleMock( aColor, aSimilarLines );
             if ( m_NumberRules.size() > m_RuleIndex )
             {
-                std::cout << "REturned" << std::endl;
                 return m_NumberRules[ m_RuleIndex++ ];
             }
 
