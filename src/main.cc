@@ -38,23 +38,24 @@ int main( int argc, char* argv[] )
 
     // handle stdin with timeout
     fd_set selectset;
-    struct timeval timeout = {1,0}; //timeout of 10 secs.
+    struct timeval timeout = { 10, 0 }; //timeout of 10 secs.
     int ret;
-    FD_ZERO(&selectset);
+    FD_ZERO( &selectset );
 
-    FD_SET(0,&selectset);
-    ret =  select(1,&selectset,NULL,NULL,&timeout);
+    FD_SET( 0, &selectset );
+    ret =  select( 1, &selectset, NULL, NULL, &timeout );
     if(ret == 0)
         return 0;
           //timeout
-    else if(ret == -1)
+    else if ( ret == -1 )
         return 0;
           //  //error
     else 
     {
         size_t lI( 0 );
-        while ( std::getline(std::cin, lLine ) )
-            std::cout << lAppliedRules->process( lLine, lI++ ) << std::endl;
+        while ( std::getline( std::cin, lLine ) )
+            if ( lLine.size() )
+                std::cout << lAppliedRules->process( lLine, lI++ ) << std::endl;
     }
     return 0;
 }
