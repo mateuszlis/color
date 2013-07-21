@@ -10,6 +10,10 @@ ready to used schemes for gcc output, syslog, apachelog etc. To see more, see
 
 How to use color?
 =========
+usage:
+
+[some command] | color [color-scheme]
+
 examples:
 $ cat /var/log/syslog | color syslog
 

@@ -28,10 +28,20 @@ install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/data/color.conf
    DESTINATION /etc/
    COMPONENT configuration)
 
+set(MAN_PATH $ENV{MANPATH})
+if (!MAN_PATH)
+    set(MAN_PATH "/usr/man")
+endif()
+
+message(STATUS "Manual path ${MAN_PATH}")
 if (BUILD_TESTS)
     # setup testing
     enable_testing()
     add_subdirectory(tests)
 endif() 
+
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/data/color.1
+   DESTINATION ${MAN_PATH}/man1
+   COMPONENT manual)
 
 add_subdirectory(src)

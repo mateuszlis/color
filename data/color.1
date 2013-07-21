@@ -1,0 +1,60 @@
+.\" color man page
+.if !\n(.g \{\
+.	if !\w|\*(lq| \{\
+.		ds lq ``
+.		if \w'\(lq' .ds lq "\(lq
+.	\}
+.	if !\w|\*(rq| \{\
+.		ds rq ''
+.		if \w'\(rq' .ds rq "\(rq
+.	\}
+.\}
+.de Id
+.ds Dt \\$4
+..
+.Id $Id: color.1,v 0.8 2013/07/20 13:20:04 bero Exp $
+.TH COLOR 1 \*(Dt "Mateusz Lis"
+.SH NAME
+color \- colorize console output of any program over unix pipe
+.SH SYNOPSIS
+.RI [ some-command ]
+.B | color
+.RI [ color-scheme ]
+.SH EXAMPLES
+$ cat /var/log/syslog |
+.B color 
+syslog
+.PP
+$ make &2>1 |
+.B color 
+gcc
+.PP
+$ valgrind --leak-check=full myProgram |
+.B color 
+valgrind
+.SH DESCRIPTION
+.PP
+.B Color 
+searches the standard input for the keywords to 
+.B colorize.
+There are several predefined color-schemes (gcc, syslog, valgrind). Color-schemes can be altered/added in the conf
+file (usually /etc/color.conf).
+.SH OPTIONS
+.TP
+No command line options
+.SH DIAGNOSTICS
+.PP
+Normally, exit status is 0 if selected lines are found and 1 otherwise.
+But the exit status is 2 if an error occurred
+.SH BUGS
+.PP
+Email bug reports to
+.BR mateusz.lis@gmail.com .
+Be sure to include the word \*(lqcolor\*(rq somewhere in the
+\*(lqSubject:\*(rq field.
+.PP
+.SH "SEE ALSO"
+.BR grep (1),
+
+.\" Work around problems with some troff -man implementations.
+.br
