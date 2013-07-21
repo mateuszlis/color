@@ -45,11 +45,17 @@ int main( int argc, char* argv[] )
     FD_SET( 0, &selectset );
     ret =  select( 1, &selectset, NULL, NULL, &timeout );
     if(ret == 0)
+    {
+        displayHelp();
         return 0;
           //timeout
+    }
     else if ( ret == -1 )
-        return 0;
+    {
+        displayHelp();
+        return 2;
           //  //error
+    }
     else 
     {
         size_t lI( 0 );

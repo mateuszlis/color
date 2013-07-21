@@ -28,5 +28,14 @@ void color( ColorName aCol, const std::string& aTxt, std::ostream& aStream, Colo
     aStream << COLOR_NAMES[aCol] << aTxt << COLOR_NAMES[resetCol];
 }
 
+void displayHelp()
+{
+    std::cerr << "Usage: [some-program] | color [color-scheme] " << std::endl
+        << "Examples: " << std::endl
+        << "$ cat /var/log/syslog | color syslog" << std::endl
+        << "$ make 2>&1 | color gcc" << std::endl << std::endl
+        << "Enter man color for more information" << std::endl;
+}
+
 
 } // namespace Color
