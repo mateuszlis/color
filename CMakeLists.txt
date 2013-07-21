@@ -3,7 +3,8 @@ option(BUILD_TESTS "Build all of unit tests." FALSE)
 project (color)
 
 add_subdirectory(CMake)
-FIND_PACKAGE( Boost 1.40 COMPONENTS regex program_options REQUIRED )
+set(Boost_USE_STATIC_LIBS   ON)
+FIND_PACKAGE( Boost 1.38 COMPONENTS regex program_options REQUIRED )
 INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
 
 
@@ -22,6 +23,10 @@ set (BASE_SRC_DIR "${CMAKE_SOURCE_DIR}/src")
 file(COPY
         ${CMAKE_CURRENT_SOURCE_DIR}/data/color.conf
             DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/)
+#configure_file(${CMAKE_CURRENT_SOURCE_DIR}/data/color.conf /etc/color.conf)
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/data/color.conf
+   DESTINATION /etc/
+   COMPONENT configuration)
 
 if (BUILD_TESTS)
     # setup testing

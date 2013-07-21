@@ -8,12 +8,14 @@
 #include "RuleBox.hh"
 #include "Rules.hh"
 
-std::ifstream findConfig();
+void findConfig( std::ifstream& aStr );
 
 using namespace Color;
 int main( int argc, char* argv[] )
 {
     std::ifstream lStr( "color.conf" );
+    findConfig( lStr );
+
     Config::Ptr lConf( new Config( lStr ) );
     RuleBox::Ptr lAppliedRules;
     if ( argc > 1 )
@@ -57,3 +59,10 @@ int main( int argc, char* argv[] )
     return 0;
 }
 
+
+void findConfig( std::ifstream& aStr )
+{
+    if ( aStr.is_open() )
+        return;
+    aStr.open( "/etc/color.conf" );
+}
