@@ -6,7 +6,7 @@ SET(CPACK_PACKAGE_VERSION "1.0")
 SET(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "amd64")
 SET(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6 (>= 2.3.1-6), libgcc1 (>= 1:3.4.2-12)")
 SET(CPACK_DEBIAN_PACKAGE_PRIORITY "optional")
-SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "mateusz lis mateusz.lis@gmail.com")
+SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "mateusz lis <mateusz.lis@gmail.com>")
 
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "color - unix console tool for log syntax coloring")
 SET(CPACK_PACKAGE_VENDOR "Mateusz Lis")
