@@ -23,13 +23,12 @@ set (BASE_SRC_DIR "${CMAKE_SOURCE_DIR}/src")
 file(COPY
         ${CMAKE_CURRENT_SOURCE_DIR}/data/color.conf
             DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/)
-#configure_file(${CMAKE_CURRENT_SOURCE_DIR}/data/color.conf /etc/color.conf)
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/data/color.conf
    DESTINATION /etc/
    COMPONENT configuration)
 
 set(MAN_PATH $ENV{MANPATH})
-if (!MAN_PATH)
+if( "${MAN_PATH}" STREQUAL "" )
     set(MAN_PATH "/usr/man")
 endif()
 
@@ -39,6 +38,7 @@ if (BUILD_TESTS)
     enable_testing()
     add_subdirectory(tests)
 endif() 
+
 
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/data/color.1
    DESTINATION ${MAN_PATH}/man1
