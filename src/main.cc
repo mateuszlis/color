@@ -9,7 +9,6 @@
 #include "RuleBox.hh"
 #include "Rules.hh"
 
-void findConfig( std::ifstream& aStr );
 namespace po = boost::program_options;
 
 using namespace Color;
@@ -86,9 +85,3 @@ int main( int aArgc, char* aArgv[] )
 }
 
 
-void findConfig( std::ifstream& aStr )
-{
-    if ( aStr.is_open() )
-        return;
-    aStr.open( "/etc/color.conf" );
-}
