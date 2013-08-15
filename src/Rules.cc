@@ -76,8 +76,19 @@ void Rule::applyPartial( const std::string& aLine
     while ( boost::regex_search( lStart, lEnd, lSearchRes, m_Regex )
             && !( lGlobal == aLine.size() ) ) // protection against full match
     {
-        aResContainer.putMarker( lGlobal + lSearchRes.position(), m_Color );
-        aResContainer.putMarker( lGlobal + lSearchRes.position() + lSearchRes.length(), m_Color );
+        if ( lSearchRes.size() > 1 )
+        {
+            for ( size_t i = 1; i < lSearchRes.size(); ++i )
+            {
+                aResContainer.putMarker( lGlobal + std::distance(lStart, lSearchRes[i].first), m_Color );
+                aResContainer.putMarker( lGlobal + std::distance(lStart, lSearchRes[i].second), m_Color );
+            }
+        }
+        else
+        {
+            aResContainer.putMarker( lGlobal + lSearchRes.position(), m_Color );
+            aResContainer.putMarker( lGlobal + lSearchRes.position() + lSearchRes.length(), m_Color );
+        }
         lStart += lSearchRes.position() + lSearchRes.length();
         lGlobal += lSearchRes.position() + lSearchRes.length();
     }
