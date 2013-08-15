@@ -73,7 +73,7 @@ void Rule::applyPartial( const std::string& aLine
     size_t lGlobal( 0 );
     std::string::const_iterator lStart( aLine.begin() )
                                 , lEnd( aLine.end() );
-    while ( boost::regex_search( lStart, lEnd, lSearchRes, m_Regex, lStart > aLine.begin() ? boost::match_not_bol : boost::match_default )
+    while ( boost::regex_search( lStart, lEnd, lSearchRes, m_Regex )
             && !( lGlobal == aLine.size() ) ) // protection against full match
     {
         if ( lSearchRes.size() > 1 )
