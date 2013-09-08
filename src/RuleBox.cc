@@ -13,6 +13,26 @@ void RuleBox::addRule( const IRule::Ptr& aRule )
     m_Rules.push_front( aRule );
 }
 
+RuleBox& RuleBox::addBox( const RuleBox& aBox )
+{
+    for( auto lRule : aBox.m_Rules )
+    {
+        addRule( lRule );
+    }
+
+    return *this;
+}
+
+RuleBox RuleBox::operator+( const RuleBox& aBox ) const
+{
+    RuleBox lTempRes;
+    for ( auto lRule : aBox.m_Rules )
+        lTempRes.addRule( lRule );
+    for ( auto lRule : m_Rules )
+        lTempRes.addRule( lRule );
+    return lTempRes;
+}
+
 std::string RuleBox::process( const std::string& aText
         , const uint64_t aLineNumber ) const
 {

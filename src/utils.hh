@@ -1,7 +1,6 @@
 #pragma once
 
 #include <string>
-#include <boost/regex.hpp>
 
 namespace Color {
 
@@ -32,7 +31,7 @@ enum ColorName
 void color( ColorName aCol, const std::string& aTxt, std::ostream& aStream, ColorName resetCol = RESET );
 
 void displayHelp();
-void findConfig( std::ifstream& aStr );
+bool findConfig( std::ifstream& aStr );
 
 
 } // namespace Color

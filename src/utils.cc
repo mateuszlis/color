@@ -68,7 +68,7 @@ std::string getHomeConfigPath()
     return std::string( lHomePath + COLOR_HOME_CONF_DIR + COLOR_CONF_FILENAME );
 }
 
-void findConfig( std::ifstream& aStr )
+bool findConfig( std::ifstream& aStr )
 {
     static const size_t PATHS_SIZE = 2;
     static const std::string lPaths[ PATHS_SIZE ] = { getHomeConfigPath(), COLOR_CONF_DIR + COLOR_CONF_FILENAME };
@@ -77,7 +77,7 @@ void findConfig( std::ifstream& aStr )
     {
         aStr.open( lPaths[ lI++ ] );
     }
+    return aStr.is_open();
 }
-
 
 } // namespace Color

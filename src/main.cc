@@ -4,6 +4,7 @@
 #include <boost/program_options.hpp>
 
 #include "Config.hh"
+#include "CLHandler.hh"
 #include "utils.hh"
 #include "RuleBox.hh"
 #include "Rules.hh"
@@ -13,42 +14,20 @@ namespace po = boost::program_options;
 using namespace Color;
 int main( int aArgc, char* aArgv[] )
 {
-    // Declare the supported options.
-    po::options_description lDesc( "Allowed options" );
-    lDesc.add_options()
-        ( "help", "produce help message" )
-            ;
-
-            po::variables_map lVm;
-            po::store( po::parse_command_line( aArgc, aArgv, lDesc ), lVm );
-            po::notify( lVm );
-
-            if ( lVm.count( "help" ) ) 
-            {
-                displayHelp();
-                return 1;
-            }
-
-    // read configuration
-    std::ifstream lStr( "color.conf" );
-    findConfig( lStr );
-
-    Config::Ptr lConf( new Config( lStr ) );
     RuleBox::Ptr lAppliedRules;
-    if ( aArgc > 1 )
+    try
     {
-        try 
-        {
-            lAppliedRules = lConf->getRuleBox( aArgv[ 1 ] );
-        }
-        catch( std::exception& e)
-        {
-
-        }
+        CLHandler handler( aArgc, aArgv );
+        lAppliedRules = handler.produceRules();
     }
-    if ( !lAppliedRules )
+    catch ( const std::exception& e )
     {
-        lAppliedRules = lConf->getAllRules().begin()->second;
+        std::cerr << "Error occurred " << e.what() << std::endl;
+        displayHelp();
+    }
+    catch ( ... )
+    {
+        displayHelp();
     }
 
     std::string lLine;

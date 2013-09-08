@@ -17,7 +17,12 @@
 // project-local
 #include "utils.hh"
 #include "Rules.hh"
+
+ // I very much prefer this to cryptic  FRIEND_TEST declarations
+#define protected public
+// tested lib
 #include "RuleBox.hh"
+#undef protected
 
 namespace Color { namespace Test {
 
@@ -73,5 +78,46 @@ TEST( RuleBox, OverlappingRules )
     EXPECT_EQ( lResult, lExp )
         << " Not equal exp:[" << lExp << "] res:[" << lResult << "]" ;
 }
+
+TEST( RuleBox, CombiningBoxes )
+{
+    // create some boxes and rules
+    RuleBox::Ptr lRuleBox1( new RuleBox );
+    RuleBox::Ptr lRuleBox2( new RuleBox );
+    IRule::Ptr lRule1( new Rule( BROWN, "" ) );
+    IRule::Ptr lRule2( new Rule( RED, "" ) );
+    IRule::Ptr lRule3( new Rule( GREEN, "" ) );
+    lRuleBox1->addRule( lRule1 );
+    lRuleBox1->addRule( lRule2 );
+    lRuleBox2->addRule( lRule3 );
+
+    // invoke opeator+ to create new RuleBox
+    RuleBox lNewOne( *lRuleBox1 + *lRuleBox2 );
+    // and modify the original stuff
+    lRuleBox2->addBox( *lRuleBox1 );
+
+    // now verify
+    ASSERT_EQ( lRuleBox2->m_Rules.size(), 3u );
+
+    // assure proper order
+    EXPECT_EQ( lRuleBox2->m_Rules.front().get(), lRule1.get() );
+    EXPECT_NO_THROW( lRuleBox2->m_Rules.pop_front() );
+    EXPECT_EQ( lRuleBox2->m_Rules.front().get(), lRule2.get() );
+    EXPECT_NO_THROW( lRuleBox2->m_Rules.pop_front() );
+    EXPECT_EQ( lRuleBox2->m_Rules.front().get(), lRule3.get() );
+
+    ASSERT_EQ( lRuleBox1->m_Rules.size(), 2u );
+
+    ASSERT_EQ( lNewOne.m_Rules.size(), 3u );
+    // assure proper order
+    EXPECT_EQ( lNewOne.m_Rules.front().get(), lRule1.get() );
+    EXPECT_NO_THROW( lNewOne.m_Rules.pop_front() );
+    EXPECT_EQ( lNewOne.m_Rules.front().get(), lRule2.get() );
+    EXPECT_NO_THROW( lNewOne.m_Rules.pop_front() );
+    EXPECT_EQ( lNewOne.m_Rules.front().get(), lRule3.get() );
+
+
+}
+
 }} // namespace Color::ColorTest
 

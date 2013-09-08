@@ -74,6 +74,10 @@ class Config
                 , const RuleBox::Ptr& aCurrentRuleBox )
         { return ( boost::regex_match( aLine, RULE_WHOLE_REG )
                 && aCurrentRuleBox ); }
+
+        // for Mock class
+        Config() {}
+
     protected: // fields
         RuleMap m_Rules;
         RuleCreator m_CreateRule;
