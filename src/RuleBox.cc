@@ -33,6 +33,11 @@ RuleBox RuleBox::operator+( const RuleBox& aBox ) const
     return lTempRes;
 }
 
+const std::list< IRule::Ptr >& RuleBox::getRules() const
+{
+    return m_Rules;
+}
+
 std::string RuleBox::process( const std::string& aText
         , const uint64_t aLineNumber ) const
 {

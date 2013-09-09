@@ -15,6 +15,7 @@ class Config
         static const boost::regex NUMBER_RULE_REG;
         static const boost::regex RULE_REG;
         static const boost::regex RULE_WHOLE_REG;
+        static const boost::regex REF_RULE_REG;
         static const uint8_t OMIT_FIRST_BRACKET = 1;
         static const uint8_t NUMBER_OF_BRACKETS_RULEBOX = 2;
         static const uint8_t NUMBER_OF_WORDS = 2;
@@ -28,6 +29,8 @@ class Config
                 , const std::string&, bool ) > RuleCreator;
         typedef std::function< NumberRule::Ptr( ColorName
                 , const uint8_t ) > NumberRuleCreator;
+        typedef std::function< ReferenceRule::Ptr( 
+            const std::string&, Config&  ) >ReferenceRuleCreator;
         typedef std::function< RuleBox::Ptr( void ) > RuleBoxCreator;
         typedef std::vector< std::string > Words;
         typedef std::vector< ColorName > Colors;
@@ -37,6 +40,7 @@ class Config
         Config( std::istream& aFile
                 , RuleCreator aRuleCreator
                 , NumberRuleCreator aNumberRuleCreator
+                , ReferenceRuleCreator aRefCreator
                 , RuleBoxCreator aRuleBoxCreator );
 
         virtual const RuleBox::Ptr getRuleBox( const std::string& aName ) const;
@@ -45,7 +49,9 @@ class Config
     protected: // functions
         void parseConfig( std::istream& aStr );
         ColorName matchColor( const std::string& aColorStr );
-        void preprocessLine( const std::string& aLine, Words& aValues );
+        void preprocessLine( const std::string& aLine
+                , Words& aValues );
+        std::string getDataPart( const std::string& aLine );
         void handleRuleBox( RuleBox::Ptr& aCurrentRule
                 , const std::string& aLine );
         void handleNumberRule( RuleBox::Ptr& aCurrentRuleBox
@@ -55,6 +61,8 @@ class Config
                 , const bool aWholeL );
         void handleError( const std::string& aLine
                 , const size_t aLineNumber );
+        void handleRefRule( const std::string& aLine 
+                , RuleBox::Ptr& aCurrentRuleBox );
 
         // condition simplifiers
         bool isRelevant( const std::string& aLine )
@@ -74,6 +82,10 @@ class Config
                 , const RuleBox::Ptr& aCurrentRuleBox )
         { return ( boost::regex_match( aLine, RULE_WHOLE_REG )
                 && aCurrentRuleBox ); }
+        bool couldBeRefRule( const std::string& aLine
+                , const RuleBox::Ptr& aCurrentRuleBox )
+        { return ( boost::regex_match( aLine, REF_RULE_REG )
+                && aCurrentRuleBox ); }
 
         // for Mock class
         Config() {}
@@ -83,6 +95,7 @@ class Config
         RuleCreator m_CreateRule;
         NumberRuleCreator m_CreateNumberRule;
         RuleBoxCreator m_CreateRuleBox;
+        ReferenceRuleCreator m_CreateRefRule;
 
 
 

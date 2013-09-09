@@ -13,6 +13,18 @@ class MockIntermediateResult : public IntermediateResult
             , void( size_t aIndex, const ColorName aColor ) );
 }; // class MockIntermediateResult
 
+class MockRule : public IRule
+{
+    public: // typedefs
+        typedef std::shared_ptr< MockRule > Ptr;
+
+    public: // functions
+        MOCK_CONST_METHOD3( apply
+                , void( const std::string&
+                      , IntermediateResult& 
+                      , uint64_t ) );
+}; // MockRule
+
 class MockNumberRule : public NumberRule
 {
     public:  // typedefs
@@ -75,6 +87,17 @@ class FakeRuleProducer
                 return m_Configs[ m_ConfigIndex++ ];
             return Config::Ptr( new Config( aStream ) );
         }
+
+        ReferenceRule::Ptr produceRefRule( 
+                const std::string& aStr
+                , Config& aConf )
+        {
+            produceRefRuleMock( aStr, aConf );
+            if ( m_RefRules.size() > m_RefIndex )
+                return m_RefRules[ m_RefIndex++ ];
+            return ReferenceRule::Ptr( new ReferenceRule( aStr
+                                                    , aConf ) );
+        }
         MOCK_METHOD3( produceRuleMock
                 , void( ColorName, const std::string&
                     , bool ) );
@@ -84,19 +107,24 @@ class FakeRuleProducer
                 , void( void ) );
         MOCK_METHOD1( produceConfigMock
                 , void( std::istream& aStream ) );
+        MOCK_METHOD2( produceRefRuleMock
+                , void( const std::string&, Config& ) );
 
     public: // helper functions
         void addRuleBox( RuleBox::Ptr aBox ) { m_RuleBoxes.push_back( aBox ); };
         void addNumberRule( NumberRule::Ptr aRule ) { m_NumberRules.push_back( aRule ); };
         void addConfig( Config::Ptr aConfig ) { m_Configs.push_back( aConfig ); };
+        void addRefRule( ReferenceRule::Ptr aRefRule ) { m_RefRules.push_back( aRefRule ); };
 
     protected: // fields
         std::vector< RuleBox::Ptr > m_RuleBoxes;
         std::vector< NumberRule::Ptr > m_NumberRules;
         std::vector< Config::Ptr > m_Configs;
+        std::vector< ReferenceRule::Ptr > m_RefRules;
         size_t m_BoxIndex;
         size_t m_RuleIndex;
         size_t m_ConfigIndex;
+        size_t m_RefIndex;
 
 }; // class FakeRuleProducer
 

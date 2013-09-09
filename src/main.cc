@@ -19,6 +19,13 @@ int main( int aArgc, char* aArgv[] )
     {
         CLHandler handler( aArgc, aArgv );
         lAppliedRules = handler.produceRules();
+        std::string lLine;
+
+        size_t lI( 0 );
+        while ( std::getline( std::cin, lLine ) )
+            if ( lLine.size() )
+                std::cout << lAppliedRules->process( lLine, lI++ ) << std::endl << std::flush;
+        return 0;
     }
     catch ( const std::exception& e )
     {
@@ -30,11 +37,4 @@ int main( int aArgc, char* aArgv[] )
         displayHelp();
     }
 
-    std::string lLine;
-
-    size_t lI( 0 );
-    while ( std::getline( std::cin, lLine ) )
-        if ( lLine.size() )
-            std::cout << lAppliedRules->process( lLine, lI++ ) << std::endl << std::flush;
-    return 0;
 }

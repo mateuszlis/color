@@ -1,4 +1,6 @@
 #include "Rules.hh"
+#include "RuleBox.hh"
+#include "Config.hh"
 
 namespace Color {
 
@@ -119,5 +121,56 @@ void NumberRule::apply( const std::string& aLine
     aResContainer.putMarker( aLine.size(), lColor );
 }
 
+RuleGroup::RuleGroup( const RuleBox& aRuleBox )
+{
+    for( auto lRule : aRuleBox.getRules() )
+        m_Rules.push_back( lRule );
+}
+
+void RuleGroup::apply( const std::string& aLine
+                     , IntermediateResult& aResContainer
+                     , uint64_t aLineNumber ) const
+{
+    for ( auto lRule : m_Rules )
+        lRule->apply( aLine, aResContainer, aLineNumber );
+}
+
+ReferenceRule::ReferenceRule( const std::string& aSchemeName
+                            , const Config& aConfig )
+                : m_SchemeName( aSchemeName )
+                , m_Config( aConfig )
+                , m_InvestigatedString( NULL )
+{
+}
+
+void ReferenceRule::apply( const std::string& aLine
+                         , IntermediateResult& aResContainer
+                         , uint64_t aLineNumber ) const
+{
+    checkLoops( aLine );
+    auto lBox( m_Config.getRuleBox( m_SchemeName ) );
+    for ( auto lRule : lBox->getRules() )
+        lRule->apply( aLine, aResContainer, aLineNumber );
+}
+
+
+void ReferenceRule::checkLoops( const std::string& aLine ) const
+{
+    // heuristic algorithm
+    // it's actually pretty hard to do this with exact solution
+    // (ok, in fact it's easy but I don't want to waste time)
+    static uint64_t lSimCounter = 0;
+
+    if ( m_InvestigatedString != aLine.c_str() )
+    {
+        m_InvestigatedString = aLine.c_str();
+        m_InvestigatedStringCopy = aLine;
+        lSimCounter = 0;
+    }
+    else if ( m_InvestigatedStringCopy == aLine 
+            && lSimCounter++ > 1000 )
+        throw std::runtime_error( "It seems that there is a loop "
+                             "in dependencies between schemes" );
+}
 
 } // namespace Color

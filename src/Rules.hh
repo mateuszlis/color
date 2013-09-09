@@ -87,4 +87,50 @@ class NumberRule : public IRule
         std::vector< ColorName > m_Colors;
 }; // class NumberRule
 
+class RuleBox;
+
+class RuleGroup : public IRule
+{
+    public: // typedefs
+        typedef std::shared_ptr< RuleGroup > Ptr;
+
+    public: // functions
+        explicit RuleGroup( const RuleBox& aRuleBox );
+        virtual ~RuleGroup() {}
+
+        // IRule Interface
+        virtual void apply( const std::string& aLine
+                , IntermediateResult& aResContainer
+                , uint64_t aLineNumber = 0 ) const;
+
+    protected: // fields
+        std::list< IRule::Ptr > m_Rules;
+
+}; // class RuleGroup
+
+class Config;
+
+class ReferenceRule : public IRule
+{
+    public: // typedefs
+        typedef std::shared_ptr< ReferenceRule > Ptr;
+
+    public: // functions
+        explicit ReferenceRule( const std::string& aSchemeName
+                , const Config& aConfig);
+        virtual ~ReferenceRule() {}
+        // IRule interface
+        virtual void apply( const std::string& aLine
+                , IntermediateResult& aResContainer
+                , uint64_t aLineNumber = 0 ) const;
+
+    protected: // functions
+        virtual void checkLoops( const std::string& aLine ) const;
+    protected: // fields
+        const std::string m_SchemeName;
+        const Config& m_Config;
+        mutable const char* m_InvestigatedString;
+        mutable std::string  m_InvestigatedStringCopy;
+}; // class ReferenceRule
+
 } // namespace Color

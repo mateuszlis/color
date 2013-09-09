@@ -7,11 +7,12 @@
 
 namespace Color {
 
-const boost::regex Config::RULE_BOX_REG = boost::regex( "\\[[a-zA-Z0-9]*\\]" );
+const boost::regex Config::RULE_BOX_REG = boost::regex( "\\[[a-zA-Z0-9]*\\][ ]*[#]?.*" );
 const std::string COLOR_NAME ="(\\[" + COLORS_LIST + "\\],)*\\[" + COLORS_LIST + "\\]";
 const boost::regex Config::NUMBER_RULE_REG = boost::regex( "alternate=[0-9]*:" + COLOR_NAME );
 const boost::regex Config::RULE_REG = boost::regex( "color=" + COLOR_NAME + ":.*" );
 const boost::regex Config::RULE_WHOLE_REG = boost::regex( "color_full_line=" + COLOR_NAME + ":.*" );
+const boost::regex Config::REF_RULE_REG = boost::regex( "scheme=[a-zA-Z0-9]*" );
 // helper wrappers for constructors of rules
 Rule::Ptr ruleWrapper( ColorName aColor, const std::string& aRegex
         , bool aWholeLine )
@@ -25,6 +26,12 @@ NumberRule::Ptr numberRuleWrapper( ColorName aColor
     return NumberRule::Ptr( new NumberRule( aColor, aLinesNum ) );
 }
 
+ReferenceRule::Ptr refRuleWrapper( const std::string& aScheme
+                                 , Config& aConfig )
+{
+    return ReferenceRule::Ptr( new ReferenceRule( aScheme, aConfig ) );
+}
+
 RuleBox::Ptr ruleBoxWrapper()
 {
     return RuleBox::Ptr( new RuleBox );
@@ -35,6 +42,7 @@ Config::Config( std::istream& aFile )
     , m_CreateRule( &ruleWrapper )
     , m_CreateNumberRule( &numberRuleWrapper )
     , m_CreateRuleBox( &ruleBoxWrapper )
+    , m_CreateRefRule( &refRuleWrapper )
 {
     parseConfig( aFile );
 }
@@ -42,11 +50,13 @@ Config::Config( std::istream& aFile )
 Config::Config( std::istream& aFile
         , RuleCreator aRuleCreator
         , NumberRuleCreator aNumberRuleCreator
+        , ReferenceRuleCreator aRefCreator
         , RuleBoxCreator aRuleBoxCreator )
     : m_Rules()
     , m_CreateRule( aRuleCreator )
     , m_CreateNumberRule( aNumberRuleCreator )
     , m_CreateRuleBox( aRuleBoxCreator )
+    , m_CreateRefRule( aRefCreator )
 {
     parseConfig( aFile );
 }
@@ -92,6 +102,10 @@ void Config::parseConfig( std::istream& aStr )
             {
                 static const bool colorWholeLines( true );
                 handleRule( lCurrentRuleBox, lLine, colorWholeLines );
+            }
+            else if ( couldBeRefRule( lLine, lCurrentRuleBox ) )
+            {
+                handleRefRule( lLine, lCurrentRuleBox );
             }
             else
             {
@@ -143,24 +157,31 @@ ColorName Config::matchColor( const std::string& aColorStr )
         return RESET;
     return RESET;
 }
-
-void Config::preprocessLine( const std::string& aLine, Words& aValues )
+std::string Config::getDataPart( const std::string& aLine )
 {
     size_t lEqualizerLocation( aLine.find_first_of( "=" ) );
     std::string lValuePart( aLine.substr( lEqualizerLocation + 1
                 , aLine.size() - lEqualizerLocation ) );
+    return lValuePart;
+}
+
+void Config::preprocessLine( const std::string& aLine, Words& aValues )
+{
+    std::string lValuePart( getDataPart( aLine ) );
     size_t lSplitter( lValuePart.find_first_of( ":" ) );
     aValues.push_back( lValuePart.substr( 0, lSplitter ) );
-    aValues.push_back( lValuePart.substr( lSplitter + 1, lValuePart.size() - lSplitter ) );
+    aValues.push_back( lValuePart.substr( 
+                lSplitter + 1, lValuePart.size() - lSplitter ) );
 }
 
 void Config::handleRuleBox( RuleBox::Ptr& aCurrentRuleBox
         , const std::string& aLine )
 {
     aCurrentRuleBox = m_CreateRuleBox();
+    size_t lEndOfName( aLine.find_first_of( "]" ) );
     m_Rules.insert( RuleMapElem( aLine.substr(
                             OMIT_FIRST_BRACKET
-                            , aLine.size() - NUMBER_OF_BRACKETS_RULEBOX )
+                            , lEndOfName - OMIT_FIRST_BRACKET )
                 , aCurrentRuleBox ) );
 
 }
@@ -203,6 +224,14 @@ void Config::handleRule( RuleBox::Ptr& aCurrentRuleBox
     Rule::Ptr lRule( m_CreateRule( matchColor( lValues[ 0 ] )
                 , lValues[ 1 ]
                 , aWholeL ) );
+    aCurrentRuleBox->addRule( lRule );
+}
+
+void Config::handleRefRule( const std::string& aLine
+                        , RuleBox::Ptr& aCurrentRuleBox )
+{
+    std::string lSchemeName( getDataPart( aLine ) );
+    IRule::Ptr lRule( m_CreateRefRule( lSchemeName , *this ) );
     aCurrentRuleBox->addRule( lRule );
 }
 

@@ -24,6 +24,7 @@ namespace Color { namespace Test {
 using ::testing::_;
 using ::testing::InSequence;
 using ::testing::Return;
+using ::testing::AtLeast;
 class ConfigTest : public ::testing::Test
 {
     protected: // fields
@@ -31,6 +32,7 @@ class ConfigTest : public ::testing::Test
         Config::RuleCreator m_RuleCreator;
         Config::NumberRuleCreator m_NumberRuleCreator;
         Config::RuleBoxCreator m_RuleBoxCreator;
+        Config::ReferenceRuleCreator m_RefRuleCreator;
         RuleBox::Ptr m_DefaultBox;
     protected: // functions
         virtual void SetUp()
@@ -51,13 +53,22 @@ class ConfigTest : public ::testing::Test
             m_RuleBoxCreator = std::bind(
                     &FakeRuleProducer::produceRuleBox
                     , m_RuleProducer.get() );
+            m_RefRuleCreator = std::bind(
+                    &FakeRuleProducer::produceRefRule
+                    , m_RuleProducer.get()
+                    , std::placeholders::_1
+                    , std::placeholders::_2 );
             //ON_CALL( m_RuleProducer, produceRuleBox() )
             //          .WillByDefault( Return( m_DefaultBox ) );
         }
 
         Config* createConfig( std::istream& aStr )
         {
-            return new Config( aStr, m_RuleCreator, m_NumberRuleCreator, m_RuleBoxCreator );
+            return new Config( aStr
+                             , m_RuleCreator
+                             , m_NumberRuleCreator
+                             , m_RefRuleCreator
+                             , m_RuleBoxCreator );
         }
 
     void setExpectations()
@@ -75,7 +86,7 @@ class ConfigTest : public ::testing::Test
         EXPECT_CALL( *lFirstRuleBox, addRule( _ ) ).Times( 2 );
         EXPECT_CALL( *m_RuleProducer, produceNumberRuleMock( BLUE, 3 ) )
             .Times( 1 );
-        EXPECT_CALL( *lSecondRuleBox, addRule( _ ) ).Times( 1 );
+        EXPECT_CALL( *lSecondRuleBox, addRule( _ ) ).Times( AtLeast( 1 ) );
     }
 
     void proceedWithSingleColorRuleConf( ColorName aCol, std::istream& aStr, const std::string& aRuleName )
@@ -324,6 +335,28 @@ TEST_F( ConfigTest, WrongPrefixName_NonValgrind )
 
     Config::Ptr lConfig;
     ASSERT_THROW( lConfig = Config::Ptr( new Config( lStr ) ), std::runtime_error );
+}
+
+TEST_F( ConfigTest, MultipleBoxesMultipleRulesReference )
+{
+    const std::string RULE_NAME( "BoxName" ), SECOND_RULE( "Name" );
+    std::istringstream lStr(  "[" + RULE_NAME + "]\n"
+        "color_full_line=[RED]:" + REGEX + "\n"
+        "color=[BROWN]:" + REGEX + "\n"
+        "\n"
+        "\n"
+        "[" + SECOND_RULE + "]\n"
+        "\n"
+        "alternate=3:[BLUE],[BROWN]\n"
+        "scheme=" + RULE_NAME + "\n" );
+
+    setExpectations();
+    EXPECT_CALL( *m_RuleProducer
+                , produceRefRuleMock( RULE_NAME, _ ) );
+
+    Config::Ptr lConfig( createConfig( lStr ) );
+    ASSERT_EQ( lConfig->getAllRules().size(), TWO )
+        << " Number of rules in file should be 1";
 }
 }} // namespace Color::ColorTest
 

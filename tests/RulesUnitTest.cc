@@ -150,5 +150,154 @@ TEST( NumberRuleTest, two_colors )
 }
 
 
+TEST( GroupRuleTest, group_rule_single_rule )
+{
+    const bool lColorizeWholeLines( true );
+    const std::string lRegex( "[0-9]+" );
+    InSequence dummy;
+    Rule::Ptr lRule( new Rule( RED, lRegex, lColorizeWholeLines ) );
+    RuleBox lBox;
+    lBox.addRule( lRule );
+    RuleGroup::Ptr lGroup( new RuleGroup( lBox ) );
+
+    MockIntermediateResult lIResult;
+
+    std::string lFirstLine( "§ first line " );
+    std::string lSecondLine( "2 line " );
+    std::string lThirdLine( "third line" );
+    std::string lFourthLine( "4 line" );
+    EXPECT_CALL( lIResult, putMarker( _, _ ) ).Times( 0 );
+    lGroup->apply( lFirstLine, lIResult );
+
+    EXPECT_CALL( lIResult, putMarker( 0, RED ) );
+    EXPECT_CALL( lIResult, putMarker( 7, RED ) );
+    lGroup->apply( lSecondLine, lIResult );
+
+    EXPECT_CALL( lIResult, putMarker( _, _ ) ).Times( 0 );
+    lGroup->apply( lThirdLine, lIResult );
+
+    EXPECT_CALL( lIResult, putMarker( 0, RED ) );
+    EXPECT_CALL( lIResult, putMarker( 6, RED ) );
+    lGroup->apply( lFourthLine, lIResult );
+}
+
+TEST( GroupRuleTest, group_rule_multiple_rules )
+{
+    const bool lColorizeWholeLines( true );
+    const size_t lLinesCount( 3 );
+    const std::string lRegex( "[0-9]+" );
+    InSequence dummy;
+    Rule::Ptr lRule( new Rule( BLUE, lRegex, lColorizeWholeLines ) );
+    RuleBox lBox;
+    lBox.addRule( lRule );
+    lBox.addRule( IRule::Ptr( new NumberRule( RED, lLinesCount ) ) );
+    RuleGroup::Ptr lGroup( new RuleGroup( lBox ) );
+
+    MockIntermediateResult lIResult;
+
+    std::string lFirstLine( "§ first line " );
+    std::string lSecondLine( "2 line " );
+    std::string lThirdLine( "third line" );
+    std::string lFourthLine( "4 line" );
+    EXPECT_CALL( lIResult, putMarker( 0, RED ) );
+    EXPECT_CALL( lIResult, putMarker( lFirstLine.size(), RED ) );
+    lGroup->apply( lFirstLine, lIResult );
+
+    EXPECT_CALL( lIResult, putMarker( 0, RED ) );
+    EXPECT_CALL( lIResult, putMarker( 7, RED ) );
+    EXPECT_CALL( lIResult, putMarker( 0, BLUE ) );
+    EXPECT_CALL( lIResult, putMarker( 7, BLUE ) );
+    lGroup->apply( lSecondLine, lIResult );
+
+    EXPECT_CALL( lIResult, putMarker( 0, RED ) );
+    EXPECT_CALL( lIResult, putMarker( lThirdLine.size(), RED ) );
+    lGroup->apply( lThirdLine, lIResult );
+
+    EXPECT_CALL( lIResult, putMarker( 0, RED ) );
+    EXPECT_CALL( lIResult, putMarker( 6, RED ) );
+    EXPECT_CALL( lIResult, putMarker( 0, BLUE ) );
+    EXPECT_CALL( lIResult, putMarker( 6, BLUE ) );
+    lGroup->apply( lFourthLine, lIResult );
+}
+
+TEST( ReferenceRuleTest, ProperTest )
+{
+    const std::string lLine( "some text" );
+    const std::string lSchemeName( "scheme" )
+                    , lRefScheme( "refScheme" );
+
+    MockRule::Ptr lMockRule( new MockRule );
+    RuleBox::Ptr lBox( new RuleBox );
+    lBox->addRule( lMockRule );
+    MockConfig::Ptr lConfig( new MockConfig );
+    Config::RuleMap lMap;
+    lMap[ lSchemeName ] = lBox;
+
+    // create reference rule
+    RuleBox::Ptr lRefBox( new RuleBox );
+    lRefBox->addRule( ReferenceRule::Ptr( new ReferenceRule( lSchemeName, *lConfig ) ) );
+    lMap[ lRefScheme ] = lRefBox;
+    ON_CALL( *lConfig, getAllRules() )
+        .WillByDefault( ::testing::Return( lMap ) );
+    lConfig->setRules( lMap );
+
+    EXPECT_CALL( *lMockRule, apply( lLine, _, 0 ) ).Times( 1 );
+    lRefBox->process( lLine, 0 );
+
+    std::stringstream lStr;
+    lStr << "a"; // prevent compiler from optimizing out
+    // the same strings to the same address
+    EXPECT_CALL( *lMockRule, apply( lStr.str(), _, 0 ) ).Times( 1 );
+    lRefBox->process( lStr.str(), 0 );
+
+    EXPECT_CALL( *lMockRule, apply( "a", _, 0 ) ).Times( 1 );
+    lRefBox->process( "a", 0 );
+
+}
+
+TEST( ReferenceRuleTest, Non_existing_conf )
+{
+    const std::string lLine( "some text" );
+    const std::string lSchemeName( "scheme" )
+                    , lRefScheme( "refScheme" );
+
+    MockRule::Ptr lMockRule( new MockRule );
+    RuleBox::Ptr lBox( new RuleBox );
+    lBox->addRule( lMockRule );
+    MockConfig::Ptr lConfig( new MockConfig );
+    Config::RuleMap lMap;
+    // lMap[ lSchemeName ] = lBox; no RuleBox
+
+    // create reference rule
+    RuleBox::Ptr lRefBox( new RuleBox );
+    lRefBox->addRule( ReferenceRule::Ptr( new ReferenceRule( lSchemeName, *lConfig ) ) );
+    lMap[ lRefScheme ] = lRefBox;
+    ON_CALL( *lConfig, getAllRules() )
+        .WillByDefault( ::testing::Return( lMap ) );
+    lConfig->setRules( lMap );
+
+    EXPECT_THROW( lRefBox->process( lLine, 0 ), std::runtime_error );
+}
+
+TEST( ReferenceRuleTest, loop )
+{
+    const std::string lLine( "some text" );
+    const std::string lSchemeName( "scheme" );
+
+    MockRule::Ptr lMockRule( new MockRule );
+    MockConfig::Ptr lConfig( new MockConfig );
+    Config::RuleMap lMap;
+
+    // create reference rule
+    RuleBox::Ptr lRefBox( new RuleBox );
+    lRefBox->addRule( ReferenceRule::Ptr( new ReferenceRule( lSchemeName, *lConfig ) ) );
+    lMap[ lSchemeName ] = lRefBox;
+    ON_CALL( *lConfig, getAllRules() )
+        .WillByDefault( ::testing::Return( lMap ) );
+    lConfig->setRules( lMap );
+
+    EXPECT_THROW( lRefBox->process( lLine, 0 ), std::runtime_error );
+}
+
 }} // namespace Color::ColorTest
 

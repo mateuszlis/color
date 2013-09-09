@@ -19,7 +19,7 @@ class RuleBox
                 , const uint64_t aLineNumber = 0 ) const;
         virtual RuleBox& addBox( const RuleBox& aBox );
         virtual RuleBox operator+( const RuleBox& aBox ) const;
-        std::list< IRule::Ptr > m_Rules;
+        virtual const std::list< IRule::Ptr >& getRules() const;
 
     protected: // functions supporting processing
         IntermediateResult applyRules( const std::string& aText
@@ -46,6 +46,7 @@ class RuleBox
                         , const ColorName& aTopColor ) const;
 
     protected: // fields
+        std::list< IRule::Ptr > m_Rules;
 }; // class RuleBox
 
 } // namespace Color
