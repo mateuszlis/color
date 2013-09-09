@@ -4,16 +4,16 @@ project (color)
 
 add_subdirectory(CMake)
 set(Boost_USE_STATIC_LIBS   ON)
-FIND_PACKAGE( Boost 1.38 COMPONENTS regex program_options REQUIRED )
+FIND_PACKAGE( Boost 1.38 COMPONENTS regex REQUIRED )
 INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
 
 
 # Set default build type
 message(STATUS "${PROJECT_NAME}: Build type - ${CMAKE_BUILD_TYPE}")
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pipe -fstack-protector-all -Wall -Wextra --std=gnu++11 -g")
-set(CMAKE_CXX_FLAGS_DEBUG "-g") #FIXME
-set(CMAKE_CXX_FLAGS_RELEASE "-O2 -fPIC ")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pipe -fstack-protector-all -Wall -Wextra --std=gnu++11 ")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_DEBUG} -O3")
 
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 

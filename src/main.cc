@@ -1,15 +1,7 @@
 #include <iostream>
-#include <fstream>
-#include <boost/regex.hpp>
-#include <boost/program_options.hpp>
 
-#include "Config.hh"
 #include "CLHandler.hh"
-#include "utils.hh"
 #include "RuleBox.hh"
-#include "Rules.hh"
-
-namespace po = boost::program_options;
 
 using namespace Color;
 int main( int aArgc, char* aArgv[] )
@@ -36,5 +28,6 @@ int main( int aArgc, char* aArgv[] )
     {
         displayHelp();
     }
+    return 1;
 
 }
