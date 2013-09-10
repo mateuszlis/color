@@ -183,6 +183,8 @@ void Config::handleRuleBox( RuleBox::Ptr& aCurrentRuleBox
                             OMIT_FIRST_BRACKET
                             , lEndOfName - OMIT_FIRST_BRACKET )
                 , aCurrentRuleBox ) );
+    if ( !m_FirstBox )
+        m_FirstBox = aCurrentRuleBox;
 
 }
 void Config::handleNumberRule( RuleBox::Ptr& aCurrentRuleBox

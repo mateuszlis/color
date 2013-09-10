@@ -45,6 +45,8 @@ class Config
 
         virtual const RuleBox::Ptr getRuleBox( const std::string& aName ) const;
         virtual const RuleMap& getAllRules() const;
+        virtual const RuleBox::Ptr getFirstRuleBox() const
+            { return m_FirstBox; }
 
     protected: // functions
         void parseConfig( std::istream& aStr );
@@ -96,6 +98,7 @@ class Config
         NumberRuleCreator m_CreateNumberRule;
         RuleBoxCreator m_CreateRuleBox;
         ReferenceRuleCreator m_CreateRefRule;
+        RuleBox::Ptr m_FirstBox;
 
 
 

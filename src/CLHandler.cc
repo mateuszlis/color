@@ -52,6 +52,9 @@ namespace Color {
                         "argument lacks value '" + lArg + "'" );
             }
         }
+        // if not found take first one
+        if ( !lRules && m_Conf->getFirstRuleBox() )
+            lRules = RuleBox::Ptr( m_Conf->getFirstRuleBox() );
         return lRules;
     }
 
