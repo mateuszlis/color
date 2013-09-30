@@ -4,6 +4,8 @@ project (color)
 
 add_subdirectory(CMake)
 set(Boost_USE_STATIC_LIBS   ON)
+set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++")
+
 FIND_PACKAGE( Boost 1.38 COMPONENTS regex REQUIRED )
 INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
 
